@@ -12,8 +12,9 @@ const std::string GoalManager::kGoalFrameId_ = "map";
 const int GoalManager::kSleepTime_ = 100000; // u sec
 
 GoalManager::GoalManager(ros::NodeHandle n)
-  : nh_(n), ind_(1), is_doing_topic_goal(false),
-  is_wating_for_reaching_goal_(false) {
+  : nh_(n), ind_(1), is_doing_topic_goal_(false),
+  is_wating_for_reaching_goal_(false),
+  workPtr_(new boost::asio::io_service::work(ioService_)) {
   ROS_INFO_STREAM("Goal Manager Init...");
   ROS_INFO_STREAM("Start ActionLib");
   // Connect to the move_base action server
@@ -31,7 +32,8 @@ GoalManager::GoalManager(ros::NodeHandle n)
 
   GoalSendingThread_.reset(
     new boost::thread(boost::bind(&GoalManager::GoalSending, this)) );
-
+  AsioThread_.reset(
+    new boost::thread(boost::bind(&boost::asio::io_service::run, &ioService_)));
   XmlRpc::XmlRpcValue yml;
   if (!nh_.getParam(kGoalSequenceKey_, yml)) {
     ROS_ERROR_STREAM("get " << kGoalSequenceKey_ << " error");
@@ -50,20 +52,23 @@ GoalManager::GoalManager(ros::NodeHandle n)
 
   // usage functions
 void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal) {
-  if ( !goal_vector_.empty() && !is_doing_topic_goal )
-    action_client_->cancelAllGoals();
+  bool is_goal_vector_empty = goal_vector_.empty();
   geometry_msgs::PoseStamped pose_tmp;
   pose_tmp.header = goal->header;
   pose_tmp.pose = goal->pose;
   mtx_.lock();
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
-  cond_.notify_all();
+  if (is_goal_vector_empty) {
+    cond_.notify_all();
+  } else if (!is_doing_topic_goal_) {
+    action_client_->cancelAllGoals();
+    cond_.notify_all();
+  }  // else do nothing
 }
 
 void GoalManager::NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal) {
-  if ( !goal_vector_.empty() && !is_doing_topic_goal )
-    action_client_->cancelAllGoals();
+  bool is_goal_vector_empty = goal_vector_.empty();
   geometry_msgs::PoseStamped pose_tmp;
   pose_tmp.header.stamp = ros::Time::now();
   pose_tmp.pose.position = goal->position;
@@ -71,7 +76,12 @@ void GoalManager::NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal) {
   mtx_.lock();
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
-  cond_.notify_all();
+  if (is_goal_vector_empty) {
+    cond_.notify_all();
+  } else if (!is_doing_topic_goal_) {
+    action_client_->cancelAllGoals();
+    cond_.notify_all();
+  }  // else do nothing
 }
 
 bool GoalManager::IsGoalVectorsEmpty() {
@@ -99,6 +109,7 @@ void GoalManager::CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel) {
 }
 
 void GoalManager::WaitGoalReaching() {
+    is_wating_for_reaching_goal_ = true;
     while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
       if (!nh_.ok()) // exit if ros node is closed. (by pressing ctrl+c)
         exit(0);
@@ -115,7 +126,6 @@ void GoalManager::WaitGoalReaching() {
 
 void GoalManager::GoalSending() {
   while(1) {
-    is_doing_topic_goal = false;
     boost::unique_lock<boost::mutex> lock{mtx_notify_};
     if (IsGoalVectorsEmpty()) {
       ROS_INFO_STREAM("Wait for Goals!");
@@ -142,7 +152,7 @@ void GoalManager::GoalSending() {
       point_tmp.x_ = goal_tmp.target_pose.pose.position.x;
       point_tmp.y_ = goal_tmp.target_pose.pose.position.y;
       point_tmp.th_ = tf::getYaw(goal_tmp.target_pose.pose.orientation);
-      is_doing_topic_goal = true;
+      is_doing_topic_goal_ = true;
     } else {
       if ( param_goal_vector_.size() == 0 )
         continue;
@@ -153,12 +163,14 @@ void GoalManager::GoalSending() {
       goal_tmp.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(point_tmp.th_);
       goal_tmp.target_pose.header.stamp = ros::Time::now();
       phase = "param";
+      is_doing_topic_goal_ = false;
     }
     // the piority of  goal_vector is higher than param_goal_vector
 
     // send goal
     action_client_->sendGoal(goal_tmp);
     ROS_INFO_STREAM(phase <<"| Sending Goal: - [" << point_tmp.x_ << ", " << point_tmp.y_ << ", " << point_tmp.th_ << "]");
+    ioService_.post(boost::bind(&GoalManager::WaitGoalReaching, this));
     usleep(kSleepTime_);
   }
 }

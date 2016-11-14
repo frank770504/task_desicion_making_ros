@@ -8,6 +8,8 @@
 #include <geometry_msgs/Pose.h>
 #include <std_msgs/String.h>
 #include <boost/thread.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/shared_ptr.hpp>
 #include <queue>
 
 // maybe I have to add a namespace here
@@ -25,6 +27,7 @@ struct Point2D {
 
 class GoalManager {
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> ActionClient;
+  typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;
  public:
   GoalManager(ros::NodeHandle n);
   ~GoalManager() {
@@ -49,7 +52,7 @@ class GoalManager {
 
   // test
   int ind_;
-  bool is_doing_topic_goal;
+  bool is_doing_topic_goal_;
   bool is_wating_for_reaching_goal_;
   std::queue<geometry_msgs::PoseStamped> goal_vector_;
   std::vector<Point2D> param_goal_vector_;
@@ -62,9 +65,12 @@ class GoalManager {
   static const std::string kGoalFrameId_;
 
   boost::shared_ptr<boost::thread> GoalSendingThread_;
+  boost::shared_ptr<boost::thread> AsioThread_;
   boost::mutex mtx_;
   boost::mutex mtx_notify_;
   boost::condition_variable_any cond_;
+  boost::asio::io_service ioService_;
+  WorkPtr workPtr_;
 
   ActionClient* action_client_;
   ros::Subscriber new_goal_sub_;

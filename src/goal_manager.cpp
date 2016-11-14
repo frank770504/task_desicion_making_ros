@@ -53,6 +53,7 @@ GoalManager::GoalManager(ros::NodeHandle n)
   // usage functions
 void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal) {
   bool is_goal_vector_empty = goal_vector_.empty();
+  bool is_param_goal_vector_empty = param_goal_vector_.empty();
   geometry_msgs::PoseStamped pose_tmp;
   pose_tmp.header = goal->header;
   pose_tmp.pose = goal->pose;
@@ -60,7 +61,8 @@ void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPt
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
   if (is_goal_vector_empty) {
-    cond_.notify_all();
+    if (is_param_goal_vector_empty && !is_doing_topic_goal_)
+      cond_.notify_all();
   } else if (!is_doing_topic_goal_) {
     action_client_->cancelAllGoals();
     cond_.notify_all();
@@ -69,6 +71,7 @@ void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPt
 
 void GoalManager::NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal) {
   bool is_goal_vector_empty = goal_vector_.empty();
+  bool is_param_goal_vector_empty = param_goal_vector_.empty();
   geometry_msgs::PoseStamped pose_tmp;
   pose_tmp.header.stamp = ros::Time::now();
   pose_tmp.pose.position = goal->position;
@@ -77,7 +80,8 @@ void GoalManager::NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal) {
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
   if (is_goal_vector_empty) {
-    cond_.notify_all();
+    if (is_param_goal_vector_empty && !is_doing_topic_goal_)
+      cond_.notify_all();
   } else if (!is_doing_topic_goal_) {
     action_client_->cancelAllGoals();
     cond_.notify_all();
@@ -109,7 +113,6 @@ void GoalManager::CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel) {
 }
 
 void GoalManager::WaitGoalReaching() {
-    is_wating_for_reaching_goal_ = true;
     while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
       if (!nh_.ok()) // exit if ros node is closed. (by pressing ctrl+c)
         exit(0);
@@ -127,14 +130,15 @@ void GoalManager::WaitGoalReaching() {
 void GoalManager::GoalSending() {
   while(1) {
     boost::unique_lock<boost::mutex> lock{mtx_notify_};
-    if (IsGoalVectorsEmpty()) {
-      ROS_INFO_STREAM("Wait for Goals!");
-      cond_.wait(mtx_notify_);
-    }
     if (is_wating_for_reaching_goal_) {
       ROS_INFO_STREAM("Waiting for reaching this goal!");
       cond_.wait(mtx_notify_);
       is_wating_for_reaching_goal_ = false;
+      is_doing_topic_goal_ = false;
+    }
+    if (IsGoalVectorsEmpty()) {
+      ROS_INFO_STREAM("Wait for Goals!");
+      cond_.wait(mtx_notify_);
     }
     Point2D point_tmp;
     move_base_msgs::MoveBaseGoal goal_tmp;
@@ -143,6 +147,7 @@ void GoalManager::GoalSending() {
     std::string phase;
     // set goal
     if ( !goal_vector_.empty() ) {
+      is_doing_topic_goal_ = true;
       pose_tmp = goal_vector_.front();
       goal_vector_.pop();
       goal_tmp.target_pose.header = pose_tmp.header;
@@ -152,8 +157,8 @@ void GoalManager::GoalSending() {
       point_tmp.x_ = goal_tmp.target_pose.pose.position.x;
       point_tmp.y_ = goal_tmp.target_pose.pose.position.y;
       point_tmp.th_ = tf::getYaw(goal_tmp.target_pose.pose.orientation);
-      is_doing_topic_goal_ = true;
     } else {
+      is_doing_topic_goal_ = false;
       if ( param_goal_vector_.size() == 0 )
         continue;
       point_tmp = param_goal_vector_.back();
@@ -163,12 +168,13 @@ void GoalManager::GoalSending() {
       goal_tmp.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(point_tmp.th_);
       goal_tmp.target_pose.header.stamp = ros::Time::now();
       phase = "param";
-      is_doing_topic_goal_ = false;
+
     }
     // the piority of  goal_vector is higher than param_goal_vector
 
     // send goal
     action_client_->sendGoal(goal_tmp);
+    is_wating_for_reaching_goal_ = true;
     ROS_INFO_STREAM(phase <<"| Sending Goal: - [" << point_tmp.x_ << ", " << point_tmp.y_ << ", " << point_tmp.th_ << "]");
     ioService_.post(boost::bind(&GoalManager::WaitGoalReaching, this));
     usleep(kSleepTime_);

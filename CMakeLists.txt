@@ -18,6 +18,18 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 roslint_cpp()
 
+# check c++11 / c++0x
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "-std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "-std=c++0x")
+else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -133,7 +145,7 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(decision_maneger_node src/decision_maneger_node.cpp)
-add_executable(goal_manager src/goal_manager.cpp)
+add_executable(goal_manager_2 src/goal_manager.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -143,7 +155,7 @@ add_executable(goal_manager src/goal_manager.cpp)
 # target_link_libraries(decision_maneger_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(goal_manager ${catkin_LIBRARIES})
+target_link_libraries(goal_manager_2 ${catkin_LIBRARIES})
 
 #############
 ## Install ##

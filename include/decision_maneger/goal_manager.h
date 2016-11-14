@@ -42,6 +42,7 @@ class GoalManager {
   void NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal);
   void NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal);
   void CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel);
+  void WaitGoalReaching();
   void ReleaseGoalVectors();
   bool IsGoalVectorsEmpty();
   ros::NodeHandle nh_;
@@ -49,6 +50,7 @@ class GoalManager {
   // test
   int ind_;
   bool is_doing_topic_goal;
+  bool is_wating_for_reaching_goal_;
   std::queue<geometry_msgs::PoseStamped> goal_vector_;
   std::vector<Point2D> param_goal_vector_;
   static const int kSleepTime_;

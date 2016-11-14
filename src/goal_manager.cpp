@@ -12,7 +12,8 @@ const std::string GoalManager::kGoalFrameId_ = "map";
 const int GoalManager::kSleepTime_ = 100000; // u sec
 
 GoalManager::GoalManager(ros::NodeHandle n)
-  : nh_(n), ind_(1), is_doing_topic_goal(false) {
+  : nh_(n), ind_(1), is_doing_topic_goal(false),
+  is_wating_for_reaching_goal_(false) {
   ROS_INFO_STREAM("Goal Manager Init...");
   ROS_INFO_STREAM("Start ActionLib");
   // Connect to the move_base action server
@@ -97,6 +98,21 @@ void GoalManager::CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel) {
   action_client_->cancelAllGoals();
 }
 
+void GoalManager::WaitGoalReaching() {
+    while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
+      if (!nh_.ok()) // exit if ros node is closed. (by pressing ctrl+c)
+        exit(0);
+    }
+    // if don't cancel all the goals, the program will go to next goal after
+    // reach the current goal
+    if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
+      ROS_INFO_STREAM("Goal SUCCEEDED!!");
+    } else {
+      ROS_INFO_STREAM("Goal Reaching FAILED!!");
+    }
+    cond_.notify_all();
+}
+
 void GoalManager::GoalSending() {
   while(1) {
     is_doing_topic_goal = false;
@@ -104,6 +120,11 @@ void GoalManager::GoalSending() {
     if (IsGoalVectorsEmpty()) {
       ROS_INFO_STREAM("Wait for Goals!");
       cond_.wait(mtx_notify_);
+    }
+    if (is_wating_for_reaching_goal_) {
+      ROS_INFO_STREAM("Waiting for reaching this goal!");
+      cond_.wait(mtx_notify_);
+      is_wating_for_reaching_goal_ = false;
     }
     Point2D point_tmp;
     move_base_msgs::MoveBaseGoal goal_tmp;

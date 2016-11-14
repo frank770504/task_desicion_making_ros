@@ -159,19 +159,6 @@ void GoalManager::GoalSending() {
     // send goal
     action_client_->sendGoal(goal_tmp);
     ROS_INFO_STREAM(phase <<"| Sending Goal: - [" << point_tmp.x_ << ", " << point_tmp.y_ << ", " << point_tmp.th_ << "]");
-    // wait for result
-    // It will get out the loop when not able to get a plan.
-    while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
-      if (!nh_.ok()) // exit if ros node is closed. (by pressing ctrl+c)
-        exit(0);
-    }
-    // if don't cancel all the goals, the program will go to next goal after
-    // reach the current goal
-    if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
-      ROS_INFO_STREAM("Goal SUCCEEDED!!");
-    } else {
-      ROS_INFO_STREAM("Goal Reaching FAILED!!");
-    }
     usleep(kSleepTime_);
   }
 }

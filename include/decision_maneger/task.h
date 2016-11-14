@@ -29,4 +29,15 @@
 
 #ifndef DECISION_MANEGER_TASK_H
 #define DECISION_MANEGER_TASK_H
+
+namespace compal_agv {
+namespace decision_making {
+  class Task {
+    Task {
+    }
+    ~Task {
+    }
+  };
+}  // namespace decision_making
+}  // namespace compal_agv
 #endif  // DECISION_MANEGER_TASK_H

@@ -1,15 +1,46 @@
+/*
+ * Copyright (c) 2016, Compal Electronics, INC.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of
+ *    conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be used to
+ *    endorse or promote products derived from this software without specific prior written
+ *    permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 #include <decision_maneger/goal_manager.h>
+#include <queue>
+#include <string>
+#include <vector>
 
 // maybe I have to add a namespace here
 
-// TODO : add defined name here
+// add defined name here
 const std::string GoalManager::kCancelGoalSubName_ = "cancel_goal";
 const std::string GoalManager::kNewGoalSubName_ = "new_goal";
 const std::string GoalManager::kNewGoalStampedSubName_ = "new_goal_stamped";
 const std::string GoalManager::kGoalSequenceKey_ = "goal_sequence";
 const std::string GoalManager::kActionLibServername_ = "move_base";
 const std::string GoalManager::kGoalFrameId_ = "map";
-const int GoalManager::kSleepTime_ = 100000; // u sec
+const int GoalManager::kSleepTime_ = 100000;  // u sec
 
 GoalManager::GoalManager(ros::NodeHandle n)
   : nh_(n), ind_(1), is_doing_topic_goal_(false),
@@ -18,7 +49,8 @@ GoalManager::GoalManager(ros::NodeHandle n)
   ROS_INFO_STREAM("Goal Manager Init...");
   ROS_INFO_STREAM("Start ActionLib");
   // Connect to the move_base action server
-  action_client_ = new ActionClient(kActionLibServername_, true); // create a thread to handle subscriptions.
+  // create a thread to handle subscriptions.
+  action_client_ = new ActionClient(kActionLibServername_, true);
   ROS_INFO_STREAM("It will wait until move base open");
   action_client_->waitForServer();
   ROS_INFO("Server OK");
@@ -114,7 +146,7 @@ void GoalManager::CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel) {
 
 void GoalManager::WaitGoalReaching() {
     while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
-      if (!nh_.ok()) // exit if ros node is closed. (by pressing ctrl+c)
+      if (!nh_.ok())  // exit if ros node is closed. (by pressing ctrl+c)
         exit(0);
     }
     // if don't cancel all the goals, the program will go to next goal after
@@ -128,7 +160,7 @@ void GoalManager::WaitGoalReaching() {
 }
 
 void GoalManager::GoalSending() {
-  while(1) {
+  while (1) {
     boost::unique_lock<boost::mutex> lock{mtx_notify_};
     if (is_wating_for_reaching_goal_) {
       ROS_INFO_STREAM("Waiting for reaching this goal!");
@@ -168,14 +200,15 @@ void GoalManager::GoalSending() {
       goal_tmp.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(point_tmp.th_);
       goal_tmp.target_pose.header.stamp = ros::Time::now();
       phase = "param";
-
     }
     // the piority of  goal_vector is higher than param_goal_vector
 
     // send goal
     action_client_->sendGoal(goal_tmp);
     is_wating_for_reaching_goal_ = true;
-    ROS_INFO_STREAM(phase <<"| Sending Goal: - [" << point_tmp.x_ << ", " << point_tmp.y_ << ", " << point_tmp.th_ << "]");
+    ROS_INFO_STREAM(
+      phase <<"| Sending Goal: - [" << point_tmp.x_ << ", "
+            << point_tmp.y_ << ", " << point_tmp.th_ << "]");
     ioService_.post(boost::bind(&GoalManager::WaitGoalReaching, this));
     usleep(kSleepTime_);
   }

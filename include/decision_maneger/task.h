@@ -27,17 +27,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DECISION_MANEGER_TASK_H
-#define DECISION_MANEGER_TASK_H
+#ifndef INCLUDE_DECISION_MANEGER_TASK_H_
+#define INCLUDE_DECISION_MANEGER_TASK_H_
 
 namespace compal_agv {
 namespace decision_making {
-  class Task {
-    Task {
-    }
-    ~Task {
-    }
-  };
+class Task {
+  Task {
+  }
+  ~Task {
+  }
+};
 }  // namespace decision_making
 }  // namespace compal_agv
-#endif  // DECISION_MANEGER_TASK_H
+#endif  // INCLUDE_DECISION_MANEGER_TASK_H_

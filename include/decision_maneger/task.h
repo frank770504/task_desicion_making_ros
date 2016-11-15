@@ -35,7 +35,7 @@
 
 namespace compal_agv {
 namespace decision_making {
-class TaskStatus;
+class TaskStatus;  // TODO(FrankChen) define structure.
 
 class Task {
  public:
@@ -45,9 +45,9 @@ class Task {
      void GetTaskName(const std::string& name) {
        name = taskName_;
      }
-     virtual void Run();
-     virtual void Stop();
-     virtual void initialize();
+     virtual void Run() = 0;
+     virtual void Stop() = 0;
+     virtual void initialize() = 0;
  protected:
      Task() {}
      virtual ~Task() {}

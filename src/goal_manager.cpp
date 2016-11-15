@@ -56,11 +56,11 @@ GoalManager::GoalManager(ros::NodeHandle n)
   ROS_INFO("Server OK");
 
   new_goal_stamped_sub_ = nh_.subscribe<geometry_msgs::PoseStamped>(
-    kNewGoalStampedSubName_, 1, boost::bind(&GoalManager::NewGoalStampedSubCbk, this, _1));
+    kNewGoalStampedSubName_, 1, boost::bind(&GoalManager::NewGoalStampedSubCbk, this, _1));  // NOLINT
   new_goal_sub_ = nh_.subscribe<geometry_msgs::Pose>(
     kNewGoalSubName_, 1, boost::bind(&GoalManager::NewGoalSubCbk, this, _1));
   cancel_goal_sub_ = nh_.subscribe<std_msgs::String>(
-    kCancelGoalSubName_, 1, boost::bind(&GoalManager::CancelGoalSubCbk, this, _1));
+    kCancelGoalSubName_, 1, boost::bind(&GoalManager::CancelGoalSubCbk, this, _1));  // NOLINT
 
   GoalSendingThread_.reset(
     new boost::thread(boost::bind(&GoalManager::GoalSending, this)) );
@@ -83,7 +83,7 @@ GoalManager::GoalManager(ros::NodeHandle n)
 }
 
   // usage functions
-void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal) {
+void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal) {  // NOLINT
   bool is_goal_vector_empty = goal_vector_.empty();
   bool is_param_goal_vector_empty = param_goal_vector_.empty();
   geometry_msgs::PoseStamped pose_tmp;
@@ -151,7 +151,7 @@ void GoalManager::WaitGoalReaching() {
     }
     // if don't cancel all the goals, the program will go to next goal after
     // reach the current goal
-    if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
+    if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
       ROS_INFO_STREAM("Goal SUCCEEDED!!");
     } else {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
@@ -197,7 +197,7 @@ void GoalManager::GoalSending() {
       param_goal_vector_.pop_back();
       goal_tmp.target_pose.pose.position.x = point_tmp.x_;
       goal_tmp.target_pose.pose.position.y = point_tmp.y_;
-      goal_tmp.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(point_tmp.th_);
+      goal_tmp.target_pose.pose.orientation = tf::createQuaternionMsgFromYaw(point_tmp.th_);  // NOLINT
       goal_tmp.target_pose.header.stamp = ros::Time::now();
       phase = "param";
     }
@@ -219,7 +219,8 @@ void GoalManager::ParamGoalVectorPrintTest() {
   for (int i = 0; i < param_goal_vector_.size(); i++) {
     Point2D _tmp;
     _tmp = param_goal_vector_[i];
-    ROS_INFO_STREAM("- [x: " << _tmp.x_ << ", y: " << _tmp.y_ << ", th: " << _tmp.th_ << "]");
+    ROS_INFO_STREAM(
+      "- [x: " << _tmp.x_ << ", y: " << _tmp.y_ << ", th: " << _tmp.th_ << "]");
   }
 }
 

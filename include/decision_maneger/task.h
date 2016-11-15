@@ -27,16 +27,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string>
+#include <vector>
+
 #ifndef INCLUDE_DECISION_MANEGER_TASK_H_
 #define INCLUDE_DECISION_MANEGER_TASK_H_
 
 namespace compal_agv {
 namespace decision_making {
+class TaskStatus;
+
 class Task {
-  Task {
-  }
-  ~Task {
-  }
+ public:
+    void GetTaskState(const TaskStatus& status) {
+       status = taskStatus_;
+     }
+     void GetTaskName(const std::string& name) {
+       name = taskName_;
+     }
+     virtual void Run();
+     virtual void Stop();
+     virtual void initialize();
+ protected:
+     Task() {}
+     virtual ~Task() {}
+     void ExecuteInner();
+ private:
+     std::string taskName_;
+     std::vector<std::string> actions_;
+     TaskStatus taskStatus_;
 };
 }  // namespace decision_making
 }  // namespace compal_agv

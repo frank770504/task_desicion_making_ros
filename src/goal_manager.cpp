@@ -42,44 +42,10 @@ const std::string GoalManager::kActionLibServername_ = "move_base";
 const std::string GoalManager::kGoalFrameId_ = "map";
 const int GoalManager::kSleepTime_ = 100000;  // u sec
 
-GoalManager::GoalManager(ros::NodeHandle n)
-  : nh_(n), ind_(1), is_doing_topic_goal_(false),
+GoalManager::GoalManager()
+  : ind_(1), is_doing_topic_goal_(false),
   is_wating_for_reaching_goal_(false),
   workPtr_(new boost::asio::io_service::work(ioService_)) {
-  ROS_INFO_STREAM("Goal Manager Init...");
-  ROS_INFO_STREAM("Start ActionLib");
-  // Connect to the move_base action server
-  // create a thread to handle subscriptions.
-  action_client_ = new ActionClient(kActionLibServername_, true);
-  ROS_INFO_STREAM("It will wait until move base open");
-  action_client_->waitForServer();
-  ROS_INFO("Server OK");
-
-  new_goal_stamped_sub_ = nh_.subscribe<geometry_msgs::PoseStamped>(
-    kNewGoalStampedSubName_, 1, boost::bind(&GoalManager::NewGoalStampedSubCbk, this, _1));  // NOLINT
-  new_goal_sub_ = nh_.subscribe<geometry_msgs::Pose>(
-    kNewGoalSubName_, 1, boost::bind(&GoalManager::NewGoalSubCbk, this, _1));
-  cancel_goal_sub_ = nh_.subscribe<std_msgs::String>(
-    kCancelGoalSubName_, 1, boost::bind(&GoalManager::CancelGoalSubCbk, this, _1));  // NOLINT
-
-  GoalSendingThread_.reset(
-    new boost::thread(boost::bind(&GoalManager::GoalSending, this)) );
-  AsioThread_.reset(
-    new boost::thread(boost::bind(&boost::asio::io_service::run, &ioService_)));
-  XmlRpc::XmlRpcValue yml;
-  if (!nh_.getParam(kGoalSequenceKey_, yml)) {
-    ROS_ERROR_STREAM("get " << kGoalSequenceKey_ << " error");
-    ROS_INFO_STREAM("Goal Manager Init without parameter goals");
-    cond_.notify_all();
-    return;
-  }
-  // push form backward so that it can pop from the front
-  for (int i = yml.size() - 1; i >= 0; i--) {
-    Point2D pose_tmp(yml[i][0], yml[i][1], yml[i][2]);
-    param_goal_vector_.push_back(pose_tmp);
-  }
-  cond_.notify_all();
-  ROS_INFO_STREAM("Goal Manager Init...OK...");
 }
 
   // usage functions
@@ -224,10 +190,55 @@ void GoalManager::ParamGoalVectorPrintTest() {
   }
 }
 
+void GoalManager::Initialize(ros::NodeHandle n) {
+  nh_ = n;
+  ROS_INFO_STREAM("Goal Manager Init...");
+  ROS_INFO_STREAM("Start ActionLib");
+  // Connect to the move_base action server
+  // create a thread to handle subscriptions.
+  action_client_ = new ActionClient(kActionLibServername_, true);
+  ROS_INFO_STREAM("It will wait until move base open");
+  action_client_->waitForServer();
+  ROS_INFO("Server OK");
+
+  new_goal_stamped_sub_ = nh_.subscribe<geometry_msgs::PoseStamped>(
+    kNewGoalStampedSubName_, 1, boost::bind(&GoalManager::NewGoalStampedSubCbk, this, _1));  // NOLINT
+  new_goal_sub_ = nh_.subscribe<geometry_msgs::Pose>(
+    kNewGoalSubName_, 1, boost::bind(&GoalManager::NewGoalSubCbk, this, _1));
+  cancel_goal_sub_ = nh_.subscribe<std_msgs::String>(
+    kCancelGoalSubName_, 1, boost::bind(&GoalManager::CancelGoalSubCbk, this, _1));  // NOLINT
+
+  GoalSendingThread_.reset(
+    new boost::thread(boost::bind(&GoalManager::GoalSending, this)) );
+  AsioThread_.reset(
+    new boost::thread(boost::bind(&boost::asio::io_service::run, &ioService_)));
+  XmlRpc::XmlRpcValue yml;
+  if (!nh_.getParam(kGoalSequenceKey_, yml)) {
+    ROS_ERROR_STREAM("get " << kGoalSequenceKey_ << " error");
+    ROS_INFO_STREAM("Goal Manager Init without parameter goals");
+    cond_.notify_all();
+    return;
+  }
+  // push form backward so that it can pop from the front
+  for (int i = yml.size() - 1; i >= 0; i--) {
+    Point2D pose_tmp(yml[i][0], yml[i][1], yml[i][2]);
+    param_goal_vector_.push_back(pose_tmp);
+  }
+  cond_.notify_all();
+  ROS_INFO_STREAM("Goal Manager Init...OK...");
+}
+
+void GoalManager::Run() {
+}
+
+void GoalManager::Stop() {
+}
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "goal_manager");
   ros::NodeHandle nh;
-  GoalManager gm(nh);
+  GoalManager gm;
+  gm.Initialize(nh);
   ros::spin();
   return 0;
 }

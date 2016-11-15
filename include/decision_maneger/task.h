@@ -47,10 +47,10 @@ class Task {
      }
      virtual void Run() = 0;
      virtual void Stop() = 0;
-     virtual void initialize() = 0;
+     virtual void Initialize() = 0;
+     virtual ~Task() {}
  protected:
      Task() {}
-     virtual ~Task() {}
      void ExecuteInner();
  private:
      std::string taskName_;

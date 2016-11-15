@@ -65,7 +65,7 @@ class GoalManager {
   typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;
 
  public:
-  explicit GoalManager(ros::NodeHandle n);
+  GoalManager();
   ~GoalManager() {
     ReleaseGoalVectors();
     // release actionlib
@@ -73,6 +73,11 @@ class GoalManager {
   }
 
   void GoalSending();
+
+  // Fullfill Task interface
+  void Initialize(ros::NodeHandle n);
+  void Run();
+  void Stop();
 
   // test functions
   void ParamGoalVectorPrintTest();

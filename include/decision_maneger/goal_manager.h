@@ -39,6 +39,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Pose.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Empty.h>
 #include <boost/thread.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/shared_ptr.hpp>
@@ -76,8 +77,8 @@ class GoalManager {
 
   // Fullfill Task interface
   void Initialize(ros::NodeHandle n);
-  void Run();
-  void Stop();
+  void Run(const std_msgs::Empty& et);
+  void Stop(const std_msgs::Empty& et);
 
   // test functions
   void ParamGoalVectorPrintTest();
@@ -95,6 +96,7 @@ class GoalManager {
   int ind_;
   bool is_doing_topic_goal_;
   bool is_wating_for_reaching_goal_;
+  bool is_task_stop_;
   std::queue<geometry_msgs::PoseStamped> goal_vector_;
   std::vector<Point2D> param_goal_vector_;
   static const int kSleepTime_;
@@ -109,7 +111,9 @@ class GoalManager {
   boost::shared_ptr<boost::thread> AsioThread_;
   boost::mutex mtx_;
   boost::mutex mtx_notify_;
+  boost::mutex mtx_task_notify_;
   boost::condition_variable_any cond_;
+  boost::condition_variable_any task_cond_;
   boost::asio::io_service ioService_;
   WorkPtr workPtr_;
 

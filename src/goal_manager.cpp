@@ -44,7 +44,7 @@ const int GoalManager::kSleepTime_ = 100000;  // u sec
 
 GoalManager::GoalManager()
   : ind_(1), is_doing_topic_goal_(false),
-  is_wating_for_reaching_goal_(false),
+  is_wating_for_reaching_goal_(false), is_task_stop_(true),
   workPtr_(new boost::asio::io_service::work(ioService_)) {
 }
 
@@ -127,6 +127,13 @@ void GoalManager::WaitGoalReaching() {
 
 void GoalManager::GoalSending() {
   while (1) {
+    boost::unique_lock<boost::mutex> task_lock{mtx_task_notify_};
+    if (is_task_stop_) {
+      ROS_INFO_STREAM("Waiting for running task!");
+      task_cond_.wait(mtx_task_notify_);
+      is_wating_for_reaching_goal_ = false;
+      is_doing_topic_goal_ = false;
+    }
     boost::unique_lock<boost::mutex> lock{mtx_notify_};
     if (IsGoalVectorsEmpty() || is_wating_for_reaching_goal_) {
       if (is_wating_for_reaching_goal_) {
@@ -228,16 +235,27 @@ void GoalManager::Initialize(ros::NodeHandle n) {
   ROS_INFO_STREAM("Goal Manager Init...OK...");
 }
 
-void GoalManager::Run() {
+void GoalManager::Run(const std_msgs::Empty& et) {
+  is_task_stop_ = false;
+  ROS_INFO_STREAM("task run!");
+  task_cond_.notify_all();
 }
 
-void GoalManager::Stop() {
+void GoalManager::Stop(const std_msgs::Empty& et) {
+  is_task_stop_ = true;
+  if (IsGoalVectorsEmpty() || is_wating_for_reaching_goal_) {
+      cond_.notify_all();
+  }
+  ROS_INFO_STREAM("task stop!");
+  action_client_->cancelAllGoals();
 }
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "goal_manager");
   ros::NodeHandle nh;
   GoalManager gm;
+  ros::Subscriber run_sub = nh.subscribe("task_run", 1, &GoalManager::Run, &gm);  // NOLINT
+  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, &GoalManager::Stop, &gm);  // NOLINT
   gm.Initialize(nh);
   ros::spin();
   return 0;

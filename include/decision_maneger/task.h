@@ -27,36 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ros/ros.h>
 #include <string>
 #include <vector>
 
 #ifndef INCLUDE_DECISION_MANEGER_TASK_H_
 #define INCLUDE_DECISION_MANEGER_TASK_H_
 
-namespace compal_agv {
-namespace decision_making {
-class TaskStatus;  // TODO(FrankChen) define structure.
+namespace decision_manager {
+class TaskStatus{};;  // TODO(FrankChen) define structure.
 
 class Task {
  public:
-    void GetTaskState(const TaskStatus& status) {
+    void GetTaskState(TaskStatus& status) const {
        status = taskStatus_;
      }
-     void GetTaskName(const std::string& name) {
+     void GetTaskName(std::string& name) const  {
        name = taskName_;
      }
      virtual void Run() = 0;
      virtual void Stop() = 0;
-     virtual void Initialize() = 0;
+     virtual void Initialize(ros::NodeHandle n) = 0;
      virtual ~Task() {}
  protected:
      Task() {}
+     void SetTaskName(std::string name) {
+       taskName_ = name;
+     }
      void ExecuteInner();
  private:
      std::string taskName_;
      std::vector<std::string> actions_;
      TaskStatus taskStatus_;
 };
-}  // namespace decision_making
-}  // namespace compal_agv
+}  // namespace decision_manager
 #endif  // INCLUDE_DECISION_MANEGER_TASK_H_

@@ -30,6 +30,7 @@
 #ifndef INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 #define INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 
+#include "task.h"
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
@@ -47,6 +48,7 @@
 #include <string>
 #include <vector>
 
+
 // maybe I have to add a namespace here
 
 struct Point2D {
@@ -60,7 +62,7 @@ struct Point2D {
   double th_;
 };
 
-class GoalManager {
+class GoalManager : public decision_manager::Task {
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
     ActionClient;
   typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;

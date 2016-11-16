@@ -251,26 +251,3 @@ void GoalManager::Stop() {
   ROS_INFO_STREAM("task stop!");
   action_client_->cancelAllGoals();
 }
-
-typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
-TaskPtr task_handle;
-
-void TestRun(const std_msgs::Empty::ConstPtr& et) {
-  task_handle->Run();
-}
-
-void TestStop(const std_msgs::Empty::ConstPtr& et) {
-  task_handle->Stop();
-}
-
-int main(int argc, char** argv) {
-  ros::init(argc, argv, "goal_manager");
-  ros::NodeHandle nh;
-  GoalManager gm;
-  ros::Subscriber run_sub = nh.subscribe("task_run", 1, TestRun);
-  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, TestStop);
-  gm.Initialize(nh);
-  task_handle.reset(dynamic_cast<decision_manager::Task*>(&gm));
-  ros::spin();
-  return 0;
-}

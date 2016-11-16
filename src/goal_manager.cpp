@@ -128,15 +128,15 @@ void GoalManager::WaitGoalReaching() {
 void GoalManager::GoalSending() {
   while (1) {
     boost::unique_lock<boost::mutex> lock{mtx_notify_};
-    if (is_wating_for_reaching_goal_) {
-      ROS_INFO_STREAM("Waiting for reaching this goal!");
+    if (IsGoalVectorsEmpty() || is_wating_for_reaching_goal_) {
+      if (is_wating_for_reaching_goal_) {
+        ROS_INFO_STREAM("Waiting for reaching this goal!");
+      } else {
+        ROS_INFO_STREAM("Wait for Goals!");
+      }
       cond_.wait(mtx_notify_);
       is_wating_for_reaching_goal_ = false;
       is_doing_topic_goal_ = false;
-    }
-    if (IsGoalVectorsEmpty()) {
-      ROS_INFO_STREAM("Wait for Goals!");
-      cond_.wait(mtx_notify_);
     }
     Point2D point_tmp;
     move_base_msgs::MoveBaseGoal goal_tmp;

@@ -33,7 +33,8 @@
 #include <vector>
 
 // maybe I have to add a namespace here
-PLUGINLIB_EXPORT_CLASS(GoalManager, decision_manager::Task);
+namespace decision_manager_plugin {
+
 // add defined name here
 const std::string GoalManager::kCancelGoalSubName_ = "cancel_goal";
 const std::string GoalManager::kNewGoalSubName_ = "new_goal";
@@ -251,3 +252,6 @@ void GoalManager::Stop() {
   ROS_INFO_STREAM("task stop!");
   action_client_->cancelAllGoals();
 }
+};
+
+PLUGINLIB_EXPORT_CLASS(decision_manager_plugin::GoalManager, decision_manager::Task);

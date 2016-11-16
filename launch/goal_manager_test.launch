@@ -2,7 +2,7 @@
 
 <launch>
   <rosparam file="$(find decision_maneger)/config/goal_manager.yaml" command="load"/>
-  <node pkg="decision_maneger" type="goal_manager_2" name="goal_manager" output="screen">
+  <node pkg="decision_maneger" type="goal_manager_loader" name="task_loader" output="screen">
   </node>
 </launch>
 

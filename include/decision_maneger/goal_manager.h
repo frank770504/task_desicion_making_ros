@@ -40,7 +40,6 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Pose.h>
 #include <std_msgs/String.h>
-#include <std_msgs/Empty.h>
 #include <boost/thread.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/shared_ptr.hpp>
@@ -48,6 +47,7 @@
 #include <string>
 #include <vector>
 
+namespace decision_manager_plugin {
 
 // maybe I have to add a namespace here
 
@@ -124,5 +124,5 @@ class GoalManager : public decision_manager::Task {
   ros::Subscriber new_goal_stamped_sub_;
   ros::Subscriber cancel_goal_sub_;
 };
-
+};
 #endif  // INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_

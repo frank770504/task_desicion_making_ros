@@ -45,15 +45,17 @@
   <build_depend>rospy</build_depend>
   <build_depend>rostest</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>pluginlib</build_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>rostest</run_depend>
   <run_depend>std_msgs</run_depend>
+  <run_depend>pluginlib</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <pluginlib_task_ plugin="${prefix}/decision_manager_plugin.xml" />
+    <decision_maneger plugin="${prefix}/decision_manager_plugin.xml"/>
   </export>
 </package>

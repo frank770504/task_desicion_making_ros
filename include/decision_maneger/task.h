@@ -35,11 +35,11 @@
 #define INCLUDE_DECISION_MANEGER_TASK_H_
 
 namespace decision_manager {
-class TaskStatus{};;  // TODO(FrankChen) define structure.
+class TaskStatus{};  // TODO(FrankChen) define structure.
 
 class Task {
  public:
-    void GetTaskState(TaskStatus& status) const {
+     void GetTaskState(TaskStatus& status) const {
        status = taskStatus_;
      }
      void GetTaskName(std::string& name) const  {

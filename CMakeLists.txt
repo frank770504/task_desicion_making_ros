@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostest
   roslint
   std_msgs
+  pluginlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -117,8 +118,8 @@ endif()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES decision_maneger
-  CATKIN_DEPENDS actionlib roscpp rospy rostest std_msgs
+  LIBRARIES goal_manager_lib
+  CATKIN_DEPENDS actionlib roscpp rospy rostest std_msgs pluginlib
 #  DEPENDS system_lib
 )
 
@@ -145,8 +146,9 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(decision_maneger_node src/decision_maneger_node.cpp)
-#~ add_executable(goal_manager_2 src/goal_manager.cpp)
+
 add_library(goal_manager_lib src/goal_manager.cpp)
+add_executable(goal_manager_loader src/task_loader.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(decision_maneger_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -155,8 +157,9 @@ add_library(goal_manager_lib src/goal_manager.cpp)
 # target_link_libraries(decision_maneger_node
 #   ${catkin_LIBRARIES}
 # )
-#~ target_link_libraries(goal_manager_2 ${catkin_LIBRARIES})
+
 target_link_libraries(goal_manager_lib ${catkin_LIBRARIES})
+target_link_libraries(goal_manager_loader ${catkin_LIBRARIES})
 
 #############
 ## Install ##

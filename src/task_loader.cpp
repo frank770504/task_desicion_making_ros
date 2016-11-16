@@ -45,8 +45,7 @@ void TestStop(const std_msgs::Empty::ConstPtr& et) {
   task_handle->Stop();
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   ros::init(argc, argv, "task_loader");
   ros::NodeHandle nh;
   ros::Subscriber run_sub = nh.subscribe("task_run", 1, TestRun);
@@ -54,17 +53,14 @@ int main(int argc, char** argv)
   pluginlib::ClassLoader<decision_manager::Task> task_loader(
     "decision_maneger", "decision_manager::Task");
 
-  try
-  {
+  try {
     boost::shared_ptr<decision_manager::Task> test_task =
       task_loader.createInstance("decision_manager_plugin::GoalManager");
     test_task->Initialize(nh);
     task_handle.reset(test_task.get());
     ros::spin();
-  }
-  catch(pluginlib::PluginlibException& ex)
-  {
-    ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());
+  } catch(pluginlib::PluginlibException& ex) {
+    ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());  // NOLINT
   }
 
   return 0;

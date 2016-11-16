@@ -252,6 +252,6 @@ void GoalManager::Stop() {
   ROS_INFO_STREAM("task stop!");
   action_client_->cancelAllGoals();
 }
-};
+};  // namespace decision_manager_plugin
 
-PLUGINLIB_EXPORT_CLASS(decision_manager_plugin::GoalManager, decision_manager::Task);
+PLUGINLIB_EXPORT_CLASS(decision_manager_plugin::GoalManager, decision_manager::Task);  // NOLINT

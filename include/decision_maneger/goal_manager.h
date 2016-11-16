@@ -30,7 +30,7 @@
 #ifndef INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 #define INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 
-#include "task.h"
+#include <decision_maneger/task.h>
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
@@ -124,5 +124,5 @@ class GoalManager : public decision_manager::Task {
   ros::Subscriber new_goal_stamped_sub_;
   ros::Subscriber cancel_goal_sub_;
 };
-};
+};  // namespace decision_manager_plugin
 #endif  // INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_

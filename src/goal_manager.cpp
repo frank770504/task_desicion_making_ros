@@ -235,13 +235,13 @@ void GoalManager::Initialize(ros::NodeHandle n) {
   ROS_INFO_STREAM("Goal Manager Init...OK...");
 }
 
-void GoalManager::Run(const std_msgs::Empty& et) {
+void GoalManager::Run() {
   is_task_stop_ = false;
   ROS_INFO_STREAM("task run!");
   task_cond_.notify_all();
 }
 
-void GoalManager::Stop(const std_msgs::Empty& et) {
+void GoalManager::Stop() {
   is_task_stop_ = true;
   if (IsGoalVectorsEmpty() || is_wating_for_reaching_goal_) {
       cond_.notify_all();
@@ -250,13 +250,24 @@ void GoalManager::Stop(const std_msgs::Empty& et) {
   action_client_->cancelAllGoals();
 }
 
+GoalManager* gmptr;
+
+void TestRun(const std_msgs::Empty::ConstPtr& et) {
+  gmptr->Run();
+}
+
+void TestStop(const std_msgs::Empty::ConstPtr& et) {
+  gmptr->Stop();
+}
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "goal_manager");
   ros::NodeHandle nh;
   GoalManager gm;
-  ros::Subscriber run_sub = nh.subscribe("task_run", 1, &GoalManager::Run, &gm);  // NOLINT
-  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, &GoalManager::Stop, &gm);  // NOLINT
+  ros::Subscriber run_sub = nh.subscribe("task_run", 1, TestRun);
+  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, TestStop);
   gm.Initialize(nh);
+  gmptr = &gm;
   ros::spin();
   return 0;
 }

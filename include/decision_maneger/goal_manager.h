@@ -77,8 +77,8 @@ class GoalManager {
 
   // Fullfill Task interface
   void Initialize(ros::NodeHandle n);
-  void Run(const std_msgs::Empty& et);
-  void Stop(const std_msgs::Empty& et);
+  void Run();
+  void Stop();
 
   // test functions
   void ParamGoalVectorPrintTest();

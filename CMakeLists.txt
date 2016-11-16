@@ -145,8 +145,8 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(decision_maneger_node src/decision_maneger_node.cpp)
-add_executable(goal_manager_2 src/goal_manager.cpp)
-
+#~ add_executable(goal_manager_2 src/goal_manager.cpp)
+add_library(goal_manager_lib src/goal_manager.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(decision_maneger_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -155,7 +155,8 @@ add_executable(goal_manager_2 src/goal_manager.cpp)
 # target_link_libraries(decision_maneger_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(goal_manager_2 ${catkin_LIBRARIES})
+#~ target_link_libraries(goal_manager_2 ${catkin_LIBRARIES})
+target_link_libraries(goal_manager_lib ${catkin_LIBRARIES})
 
 #############
 ## Install ##

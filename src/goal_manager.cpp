@@ -27,12 +27,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <decision_maneger/goal_manager.h>
+#include <pluginlib/class_list_macros.h>
 #include <queue>
 #include <string>
 #include <vector>
 
 // maybe I have to add a namespace here
-
+PLUGINLIB_EXPORT_CLASS(GoalManager, decision_manager::Task);
 // add defined name here
 const std::string GoalManager::kCancelGoalSubName_ = "cancel_goal";
 const std::string GoalManager::kNewGoalSubName_ = "new_goal";

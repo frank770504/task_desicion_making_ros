@@ -1,0 +1,5 @@
+<library path="lib/libgoal_manager_lib">
+  <class type="decision_manager::Task" base_class_type="GoalManager">
+    <description>GoalManager plugin.</description>
+  </class>
+</library>

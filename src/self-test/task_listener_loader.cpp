@@ -50,14 +50,11 @@ class TaskListenerLoadTEST { // : public decision_manager::TaskListener {
     } catch(pluginlib::PluginlibException& ex) {
       ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());  // NOLINT
     }
-    task_handle_list_[0]->Initialize(nh_);
-    ROS_INFO_STREAM(task_handle_list_[0]->GetTaskName() << ": is initialized.");
-    //~ std::vector<decision_manager::Task>::iterator titer =
-      //~ task_handle_list_.begin();
-    //~ for (; titer != task_handle_list_.end(); ++titer) {
-      //~ (*titer)->Initialize(nh_);
-      //~ ROS_INFO_STREAM((*titer)->GetTaskName() << ": is initialized.");
-    //~ }
+    std::vector<TaskPtr>::const_iterator titer = task_handle_list_.begin();
+    for (; titer != task_handle_list_.end(); ++titer) {
+      (*titer)->Initialize(nh_);
+      ROS_INFO_STREAM((*titer)->GetTaskName() << ": is initialized.");
+    }
   }
   void RunCb(const std_msgs::Empty::ConstPtr& et) {
     ROS_INFO_STREAM(task_handle_list_[0]->GetTaskName() << ": run");
@@ -89,8 +86,10 @@ class TaskListenerLoadTEST { // : public decision_manager::TaskListener {
 const std::string TaskListenerLoadTEST::kRunSubName_ = "task_run";
 const std::string TaskListenerLoadTEST::kStopSubName_ = "task_stop";
 const std::string TaskListenerLoadTEST::kPluginPkgName_ = "decision_maneger";
-const std::string TaskListenerLoadTEST::kPluginBaseClassName_ = "decision_manager::Task";
-const std::string TaskListenerLoadTEST::kPluginTaskClassName_ = "decision_manager_plugin::GoalManager";  // NOLINT
+const std::string TaskListenerLoadTEST::kPluginBaseClassName_ =
+  "decision_manager::Task";
+const std::string TaskListenerLoadTEST::kPluginTaskClassName_ =
+  "decision_manager_plugin::GoalManager";
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "task_listener_loader");

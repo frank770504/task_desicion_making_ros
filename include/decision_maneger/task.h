@@ -26,14 +26,13 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef INCLUDE_DECISION_MANEGER_TASK_H_
+#define INCLUDE_DECISION_MANEGER_TASK_H_
 
 #include <ros/ros.h>
 #include <decision_maneger/task_listener.h>
 #include <string>
 #include <vector>
-
-#ifndef INCLUDE_DECISION_MANEGER_TASK_H_
-#define INCLUDE_DECISION_MANEGER_TASK_H_
 
 namespace decision_manager {
 class TaskStatus{};  // TODO(FrankChen) define structure.

@@ -43,8 +43,8 @@ class Task {
      void GetTaskState(TaskStatus& status) const {
        status = taskStatus_;
      }
-     void GetTaskName(std::string& name) const  {
-       name = taskName_;
+     const std::string& GetTaskName() const  {
+       return taskName_;
      }
      void AddTaskListener(const TaskListenerPtr& ptr) {
        taskListeners_.push_back(ptr);

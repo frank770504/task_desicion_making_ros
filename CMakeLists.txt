@@ -148,7 +148,7 @@ include_directories(
 # add_executable(decision_maneger_node src/decision_maneger_node.cpp)
 
 add_library(goal_manager_lib src/goal_manager.cpp)
-add_executable(goal_manager_loader src/task_loader.cpp)
+add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(decision_maneger_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

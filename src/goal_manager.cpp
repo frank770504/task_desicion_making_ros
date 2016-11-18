@@ -124,6 +124,11 @@ void GoalManager::WaitGoalReaching() {
     } else {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
     }
+    std::vector<decision_manager::TaskListenerPtr>::iterator iter =
+      taskListeners_.begin();
+    for (; iter != taskListeners_.end(); ++iter) {
+      (*iter)->OnGoalControl(*this);
+    }
     cond_.notify_all();
 }
 

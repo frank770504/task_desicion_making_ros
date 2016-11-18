@@ -32,7 +32,7 @@
 #include <pluginlib/class_loader.h>
 #include <std_msgs/Empty.h>
 
-class TaskListenerLoadTEST { // : public decision_manager::TaskListener {
+class TaskListenerLoadTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
  public:
   TaskListenerLoadTEST(ros::NodeHandle n)
@@ -54,6 +54,7 @@ class TaskListenerLoadTEST { // : public decision_manager::TaskListener {
     for (; titer != task_handle_list_.end(); ++titer) {
       (*titer)->Initialize(nh_);
       ROS_INFO_STREAM((*titer)->GetTaskName() << ": is initialized.");
+      (*titer)->AddTaskListener(decision_manager::TaskListenerPtr(this));
     }
   }
   void RunCb(const std_msgs::Empty::ConstPtr& et) {
@@ -64,11 +65,17 @@ class TaskListenerLoadTEST { // : public decision_manager::TaskListener {
     ROS_INFO_STREAM(task_handle_list_[0]->GetTaskName() << ": stop");
     task_handle_list_[0]->Stop();
   }
-  virtual void OnTaskComplete(decision_manager::Task& task) {}
-  virtual void OnTaskCancelled(decision_manager::Task& task) {}
-  virtual void OnTaskFailed(decision_manager::Task& task) {}
-  virtual void OnTaskStopped(decision_manager::Task& task) {}
-  virtual void OnGoalControl(decision_manager::Task& task) {}
+  virtual void OnTaskComplete(decision_manager::Task& task) {
+  }
+  virtual void OnTaskCancelled(decision_manager::Task& task) {
+  }
+  virtual void OnTaskFailed(decision_manager::Task& task) {
+  }
+  virtual void OnTaskStopped(decision_manager::Task& task) {
+  }
+  virtual void OnGoalControl(decision_manager::Task& task) {
+    ROS_INFO_STREAM(task.GetTaskName() << ": hasssss beeeeeen callllllllled!!!!");
+  }
  protected:
  private:
   ros::NodeHandle nh_;

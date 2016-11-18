@@ -31,6 +31,15 @@
 #define INCLUDE_DECISION_MANEGER_TASK_LISTENER_H_
 
 namespace decision_manager {
+
+enum {
+  OnTaskCompleteID,
+  OnTaskCancelledID,
+  OnTaskFailedID,
+  OnTaskStoppedID,
+  OnGoalControlID
+} CallbackID;
+
 class Task;
 
 class TaskListener {

@@ -49,6 +49,22 @@ class Task {
      void AddTaskListener(const TaskListenerPtr& ptr) {
        taskListeners_.push_back(ptr);
      }
+     void OnListenerCaller(Task& task, int func_id) {
+       std::vector<TaskListenerPtr>::iterator iter = taskListeners_.begin();
+       for (; iter != taskListeners_.end(); ++iter) {
+          if (func_id == OnTaskCompleteID) {
+            (*iter)->OnTaskComplete(task);
+          } else if (func_id == OnTaskCancelledID) {
+            (*iter)->OnTaskCancelled(task);
+          } else if (func_id == OnTaskFailedID) {
+            (*iter)->OnTaskFailed(task);
+          } else if (func_id == OnTaskStoppedID) {
+            (*iter)->OnTaskStopped(task);
+          } else if (func_id == OnGoalControlID) {
+            (*iter)->OnGoalControl(task);
+          }
+       }
+     }
      virtual void Run() = 0;
      virtual void Stop() = 0;
      virtual void Initialize(ros::NodeHandle n) = 0;

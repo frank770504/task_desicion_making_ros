@@ -31,11 +31,14 @@
 
 #include <pluginlib/class_loader.h>
 #include <std_msgs/Empty.h>
+#include <string>
+#include <vector>
 
 class TaskListenerLoadTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
+
  public:
-  TaskListenerLoadTEST(ros::NodeHandle n)
+  explicit TaskListenerLoadTEST(ros::NodeHandle n)
     : nh_(n), task_loader_(kPluginPkgName_, kPluginBaseClassName_) {
     run_sub_ = nh_.subscribe<std_msgs::Empty>(kRunSubName_, 1,
       boost::bind(&TaskListenerLoadTEST::RunCb, this, _1));
@@ -74,9 +77,9 @@ class TaskListenerLoadTEST : public decision_manager::TaskListener {
   virtual void OnTaskStopped(decision_manager::Task& task) {
   }
   virtual void OnGoalControl(decision_manager::Task& task) {
-    ROS_INFO_STREAM(task.GetTaskName() << ": hasssss beeeeeen callllllllled!!!!");
+    ROS_INFO_STREAM(task.GetTaskName() << ": has been called");
   }
- protected:
+
  private:
   ros::NodeHandle nh_;
   ros::Subscriber run_sub_;

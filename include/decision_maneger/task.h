@@ -49,6 +49,7 @@ class Task {
      void AddTaskListener(const TaskListenerPtr& ptr) {
        taskListeners_.push_back(ptr);
      }
+     // TODO(FrankChen): add defined command
      void OnListenerCaller(Task& task, int func_id) {
        std::vector<TaskListenerPtr>::iterator iter = taskListeners_.begin();
        for (; iter != taskListeners_.end(); ++iter) {
@@ -69,14 +70,17 @@ class Task {
      virtual void Stop() = 0;
      virtual void Initialize(ros::NodeHandle n) = 0;
      virtual ~Task() {}
+
  protected:
      Task() {}
      void SetTaskName(std::string name) {
        taskName_ = name;
      }
      void ExecuteInner();
+
  protected:
      std::vector<TaskListenerPtr> taskListeners_;
+
  private:
      std::string taskName_;
      std::vector<std::string> actions_;

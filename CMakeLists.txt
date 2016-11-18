@@ -149,6 +149,7 @@ include_directories(
 
 add_library(goal_manager_lib src/goal_manager.cpp)
 add_executable(goal_manager_loader src/self-test/task_loader.cpp)
+add_executable(task_listener_loader src/self-test/task_listener_loader.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(decision_maneger_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -160,6 +161,7 @@ add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 
 target_link_libraries(goal_manager_lib ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_loader ${catkin_LIBRARIES})
+target_link_libraries(task_listener_loader ${catkin_LIBRARIES})
 
 #############
 ## Install ##

@@ -28,6 +28,7 @@
  */
 
 #include <ros/ros.h>
+#include <decision_maneger/task_listener.h>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,9 @@ class Task {
      void GetTaskName(std::string& name) const  {
        name = taskName_;
      }
+     void AddTaskListener(const TaskListenerPtr& ptr) {
+       taskListeners_.push_back(ptr);
+     }
      virtual void Run() = 0;
      virtual void Stop() = 0;
      virtual void Initialize(ros::NodeHandle n) = 0;
@@ -55,6 +59,8 @@ class Task {
        taskName_ = name;
      }
      void ExecuteInner();
+ protected:
+     std::vector<TaskListenerPtr> taskListeners_;
  private:
      std::string taskName_;
      std::vector<std::string> actions_;

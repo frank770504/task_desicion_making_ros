@@ -29,4 +29,23 @@
 
 #ifndef INCLUDE_DECISION_MANEGER_TASK_LISTENER_H_
 #define INCLUDE_DECISION_MANEGER_TASK_LISTENER_H_
+
+namespace decision_manager {
+class Task;
+
+class TaskListener {
+ public:
+  virtual ~TaskListener() {
+  }
+
+  virtual void OnTaskComplete(Task& task) = 0;
+  virtual void OnTaskCancelled(Task& task) = 0;
+  virtual void OnTaskFailed(Task& task) = 0;
+  virtual void OnTaskStopped(Task& task) = 0;
+  virtual void OnGoalControl(Task& task) = 0;
+};
+
+typedef boost::shared_ptr<TaskListener> TaskListenerPtr;
+}  // namespace decision_manager
+
 #endif  // INCLUDE_DECISION_MANEGER_TASK_LISTENER_H_

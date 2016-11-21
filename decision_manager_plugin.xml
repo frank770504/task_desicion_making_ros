@@ -1,5 +1,11 @@
-<library path="lib/libgoal_manager_lib">
+<library path="libgoal_manager_lib">
   <class type="decision_manager_plugin::GoalManager" base_class_type="decision_manager::Task">
     <description>GoalManager plugin.</description>
+  </class>
+</library>
+
+<library path="libfinding_tool_lib">
+  <class type="decision_manager_plugin::FindingTool" base_class_type="decision_manager::Task">
+    <description>FindingTool plugin.</description>
   </class>
 </library>

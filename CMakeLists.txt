@@ -118,7 +118,7 @@ endif()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES goal_manager_lib
+  LIBRARIES goal_manager_lib finding_tool_lib
   CATKIN_DEPENDS actionlib roscpp rospy rostest std_msgs pluginlib
 #  DEPENDS system_lib
 )

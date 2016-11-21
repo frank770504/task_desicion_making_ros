@@ -28,4 +28,34 @@
  */
 #ifndef INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_
 #define INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_
+
+#include <decision_maneger/task.h>
+#include <laser_tool/FindShelf.h>
+#include <ros/ros.h>
+#include <std_msgs/String.h>
+#include <queue>
+#include <string>
+#include <vector>
+
+namespace decision_manager_plugin {
+
+class FindingTool : public decision_manager::Task {
+ public:
+  FindingTool();
+  ~FindingTool();
+  // Fullfill Task interface
+  void Initialize(ros::NodeHandle n);
+  void Run();
+  void Stop();
+ private:
+  ros::NodeHandle nh_;
+  static const std::string kFindShelfServiceName_;
+  static const std::string kFindShelfSucceedCmd_;
+  ros::ServiceClient find_shelf_service_client_;
+  laser_tool::FindShelf finding_tool_srv_catcher_;
+  std::vector<std::string> shelf_location_;
+ private:
+  std::vector<std::string> StringSplit(std::string str, std::string pattern);
+};
+};  // namespace decision_manager_plugin
 #endif  // INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_

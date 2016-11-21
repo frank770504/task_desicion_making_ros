@@ -26,3 +26,69 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#include <decision_maneger/finding_tool.h>
+#include <pluginlib/class_list_macros.h>
+#include <string>
+#include <vector>
+
+namespace decision_manager_plugin {
+
+const std::string FindingTool::kFindShelfServiceName_ = "/laser_tool/find_shelf";  // NOLINT
+const std::string FindingTool::kFindShelfSucceedCmd_ = "goto";
+
+FindingTool::FindingTool() {
+}
+FindingTool::~FindingTool() {
+}
+
+std::vector<std::string>
+  FindingTool::StringSplit(std::string str, std::string pattern) {
+  std::string::size_type pos;
+  std::vector<std::string> result;
+  str += pattern;
+  int size = str.size();
+  for (int i = 0; i < size; i++) {
+    pos = str.find(pattern, i);
+    if (pos < size) {
+      std::string s = str.substr(i, pos - i);
+      result.push_back(s);
+      i = pos + pattern.size() - 1;
+    }
+  }
+  return result;
+}
+
+void FindingTool::Initialize(ros::NodeHandle n) {
+  SetTaskName("FindingTool");
+  nh_ = n;
+  find_shelf_service_client_ =
+    nh_.serviceClient<laser_tool::FindShelf>(kFindShelfServiceName_);
+}
+
+void FindingTool::Run() {
+  if (find_shelf_service_client_.call(finding_tool_srv_catcher_)) {
+    //~ ros::Duration(2.0).sleep();
+    std::string shelf_loc = finding_tool_srv_catcher_.response.coord;
+    ROS_INFO_STREAM("shelf location" << shelf_loc);
+    shelf_location_ = StringSplit(shelf_loc, " ");
+    if (shelf_location_[0] == kFindShelfSucceedCmd_) {
+      //~ std::string::size_type sz;
+      //~ target_list[point_count+1].x = stod(shelf_location_[1], &sz) + 0.2;
+      //~ target_list[point_count+1].y = stod(shelf_location_[2], &sz);
+      //~ double cargo_angle = stod(shelf_location_[3], &sz);
+      //~ target_list[point_count+1].angle = degree_to_radius(cargo_angle);
+    }
+
+  } else {
+    ROS_INFO_STREAM("!!!! Finding Shelf Service Failed !!!!");
+  }
+}
+
+void FindingTool::Stop() {
+  ROS_INFO_STREAM("!!!! Finding Shelf Stop !!!!");
+}
+
+};  // namespace decision_manager_plugin
+
+PLUGINLIB_EXPORT_CLASS(decision_manager_plugin::FindingTool, decision_manager::Task);  // NOLINT

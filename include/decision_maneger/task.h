@@ -35,12 +35,26 @@
 #include <vector>
 
 namespace decision_manager {
-class TaskStatus{};  // TODO(FrankChen) define structure.
+class TaskStatus {
+ public:
+  TaskStatus()
+    : is_stoppable_(false),
+      is_able_to_cancel_(false) {
+  }
+  bool IsStoppable() {
+    return is_stoppable_;
+  }
+  bool IsAbleToCancel() {
+    return is_able_to_cancel_;
+  }
+  bool is_stoppable_;
+  bool is_able_to_cancel_;
+};  // TODO(FrankChen) define structure.
 
 class Task {
  public:
-     void GetTaskState(TaskStatus& status) const {
-       status = taskStatus_;
+     const TaskStatus& GetTaskState() const {
+       return taskStatus_;
      }
      const std::string& GetTaskName() const  {
        return taskName_;
@@ -74,6 +88,10 @@ class Task {
      Task() {}
      void SetTaskName(std::string name) {
        taskName_ = name;
+     }
+     void SetTaskStateBool(bool can_stop, bool can_cancel) {
+       taskStatus_.is_stoppable_ = can_stop;
+       taskStatus_.is_able_to_cancel_ = can_cancel;
      }
      void ExecuteInner();
 

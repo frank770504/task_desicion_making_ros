@@ -1,0 +1,16 @@
+decision_manager:
+  base_class_type: "decision_manager::Task"
+  plugin_namespace: "decision_manager_plugin"
+  used_task_list:
+    - GoalManager
+    - FindingTool
+  GoalManager:
+    task_name: "GoalManager"
+    task_command: "GoalManager"
+    can_stop: true
+    can_cancel: true
+  FindingTool:
+    task_name: "FindingTool"
+    task_command: "FindingTool"
+    can_stop: false
+    can_cancel: false

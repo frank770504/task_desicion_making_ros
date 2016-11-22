@@ -27,6 +27,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <decision_manager/task.h>
+#include <decision_manager/task_listener.h>
+#include <boost/shared_ptr.hpp>
+
+#include <pluginlib/class_loader.h>
+#include <string>
+#include <vector>
+
 #ifndef INCLUDE_DECISION_MANAGER_TASK_CONTAINER_H_
 #define INCLUDE_DECISION_MANAGER_TASK_CONTAINER_H_
+
+namespace decision_manager {
+
+class Task;
+
+class TaskContainer {
+  typedef boost::shared_ptr<Task> TaskPtr;
+  typedef pluginlib::ClassLoader<Task> PluginLoader;
+  typedef std::map<std::string, TaskPtr> TaskMap;
+
+ public:
+  explicit TaskContainer(ros::NodeHandle n);
+  ~TaskContainer() {
+  }
+  const TaskPtr& GetTask(const std::string& name) const;
+  const TaskMap& GetTasks() const {
+    return task_map_handle_list_;
+  }
+  void SetTasksListener(const TaskListenerPtr& listener);
+ private:
+  ros::NodeHandle nh_;
+  boost::shared_ptr<PluginLoader> task_loader_;
+  TaskMap task_map_handle_list_;
+  XmlRpc::XmlRpcValue yml_params_;
+  static const std::string kPluginPkgName_;
+
+  static const std::string kPluginBaseClassTypeKey_;
+  std::string PluginBaseClassType_;
+
+  static const std::string kPluginTypeNamespaceKey_;
+  std::string PluginTypeNamespace_;
+
+  static const std::string kPluginUsedTaskListKey_;
+
+  static const std::string kTaskNameKey_;
+  static const std::string kTaskCanStopKey_;
+  static const std::string kTaskCanCancelKey_;
+
+  static const std::string kRunSubName_;
+  static const std::string kStopSubName_;
+};
+};  // namespace decision_manager
+
 #endif  // INCLUDE_DECISION_MANAGER_TASK_CONTAINER_H_

@@ -55,7 +55,7 @@ class TaskListenerLoadTEST : public decision_manager::TaskListener {
 
     std::vector<TaskPtr>::const_iterator titer = task_handle_list_.begin();
     for (; titer != task_handle_list_.end(); ++titer) {
-      (*titer)->Initialize(nh_);
+      (*titer)->Initialize(nh_, "null", false, false);
       ROS_INFO_STREAM((*titer)->GetTaskName() << ": is initialized.");
       (*titer)->AddTaskListener(decision_manager::TaskListenerPtr(this));
     }

@@ -78,7 +78,8 @@ class GoalManager : public decision_manager::Task {
   void GoalSending();
 
   // Fullfill Task interface
-  void Initialize(ros::NodeHandle n);
+  void Initialize(ros::NodeHandle n, std::string task_name,
+                  bool can_stop, bool can_cancel);
   void Run();
   void Stop();
 

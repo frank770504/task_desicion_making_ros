@@ -59,8 +59,10 @@ std::vector<std::string>
   return result;
 }
 
-void FindingTool::Initialize(ros::NodeHandle n) {
-  SetTaskName("FindingTool");
+void FindingTool::Initialize(
+  ros::NodeHandle n, std::string task_name, bool can_stop, bool can_cancel) {
+  SetTaskName(task_name);
+  SetTaskStateBool(can_stop, can_cancel);
   nh_ = n;
   find_shelf_service_client_ =
     nh_.serviceClient<laser_tool::FindShelf>(kFindShelfServiceName_);

@@ -200,8 +200,10 @@ void GoalManager::ParamGoalVectorPrintTest() {
   }
 }
 
-void GoalManager::Initialize(ros::NodeHandle n) {
-  SetTaskName("GoalManager");
+void GoalManager::Initialize(
+  ros::NodeHandle n, std::string task_name, bool can_stop, bool can_cancel) {
+  SetTaskName(task_name);
+  SetTaskStateBool(can_stop, can_cancel);
   nh_ = n;
   ROS_INFO_STREAM("Goal Manager Init...");
   ROS_INFO_STREAM("Start ActionLib");

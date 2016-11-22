@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   try {
     boost::shared_ptr<decision_manager::Task> test_task =
       task_loader.createInstance("decision_manager_plugin::GoalManager");
-    test_task->Initialize(nh);
+    test_task->Initialize(nh, "null", false, false);
     task_handle.reset(test_task.get());
     ros::spin();
   } catch(pluginlib::PluginlibException& ex) {

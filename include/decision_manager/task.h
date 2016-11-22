@@ -81,7 +81,8 @@ class Task {
      }
      virtual void Run() = 0;
      virtual void Stop() = 0;
-     virtual void Initialize(ros::NodeHandle n) = 0;
+     virtual void Initialize(ros::NodeHandle n, std::string task_name,
+                             bool can_stop, bool can_cancel) = 0;
      virtual ~Task() {}
 
  protected:

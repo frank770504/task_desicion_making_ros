@@ -34,16 +34,16 @@
 #include <string>
 #include <vector>
 
-class TaskListenerLoadTEST : public decision_manager::TaskListener {
+class TaskContainerTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
 
  public:
-  explicit TaskListenerLoadTEST(ros::NodeHandle n)
+  explicit TaskContainerTEST(ros::NodeHandle n)
     : nh_(n), task_loader_(kPluginPkgName_, kPluginBaseClassName_) {
     run_sub_ = nh_.subscribe<std_msgs::Empty>(kRunSubName_, 1,
-      boost::bind(&TaskListenerLoadTEST::RunCb, this, _1));
+      boost::bind(&TaskContainerTEST::RunCb, this, _1));
     stop_sub_ = nh_.subscribe<std_msgs::Empty>(kStopSubName_, 1,
-      boost::bind(&TaskListenerLoadTEST::StopCb, this, _1));
+      boost::bind(&TaskContainerTEST::StopCb, this, _1));
     try {
       task_handle_list_.push_back(
         task_loader_.createInstance(kPluginTaskClassName_));
@@ -100,20 +100,20 @@ class TaskListenerLoadTEST : public decision_manager::TaskListener {
   static const std::string kStopSubName_;
 };
 
-const std::string TaskListenerLoadTEST::kRunSubName_ = "task_run";
-const std::string TaskListenerLoadTEST::kStopSubName_ = "task_stop";
-const std::string TaskListenerLoadTEST::kPluginPkgName_ = "decision_manager";
-const std::string TaskListenerLoadTEST::kPluginBaseClassName_ =
+const std::string TaskContainerTEST::kRunSubName_ = "task_run";
+const std::string TaskContainerTEST::kStopSubName_ = "task_stop";
+const std::string TaskContainerTEST::kPluginPkgName_ = "decision_manager";
+const std::string TaskContainerTEST::kPluginBaseClassName_ =
   "decision_manager::Task";
-const std::string TaskListenerLoadTEST::kPluginTaskClassName_ =
+const std::string TaskContainerTEST::kPluginTaskClassName_ =
   "decision_manager_plugin::GoalManager";
-const std::string TaskListenerLoadTEST::kPluginTaskClassName2_ =
+const std::string TaskContainerTEST::kPluginTaskClassName2_ =
   "decision_manager_plugin::FindingTool";
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "task_listener_loader");
+  ros::init(argc, argv, "task_container_test");
   ros::NodeHandle nh;
-  TaskListenerLoadTEST TLLT(nh);
+  TaskContainerTEST TCT(nh);
   ros::spin();
   return 0;
 }

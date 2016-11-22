@@ -104,5 +104,7 @@ class Task {
      std::vector<std::string> actions_;
      TaskStatus taskStatus_;
 };
+typedef boost::shared_ptr<Task> TaskPtr;
+static const TaskPtr NullPtr;
 }  // namespace decision_manager
 #endif  // INCLUDE_DECISION_MANAGER_TASK_H_

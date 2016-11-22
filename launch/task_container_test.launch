@@ -3,6 +3,9 @@
 <launch>
   <rosparam file="$(find decision_manager)/config/goal_manager.yaml" command="load"/>
   <rosparam file="$(find decision_manager)/config/decision_manager_config.yaml" command="load"/>
+<!--
   <node pkg="decision_manager" type="task_container_test" name="task_container_test" output="screen">
+-->
+  <node pkg="decision_manager" type="task_container_usage_test" name="task_container_usage_test" output="screen">
   </node>
 </launch>

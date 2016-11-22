@@ -152,6 +152,7 @@ add_library(finding_tool_lib src/finding_tool.cpp)
 add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 add_executable(task_listener_loader src/self-test/task_listener_loader.cpp)
 add_executable(task_container_test src/self-test/task_container_test.cpp)
+add_executable(task_container_usage_test src/self-test/task_container_usage_test.cpp src/task_container.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(decision_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -166,6 +167,7 @@ target_link_libraries(finding_tool_lib ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_loader ${catkin_LIBRARIES})
 target_link_libraries(task_listener_loader ${catkin_LIBRARIES})
 target_link_libraries(task_container_test ${catkin_LIBRARIES})
+target_link_libraries(task_container_usage_test ${catkin_LIBRARIES})
 
 #############
 ## Install ##

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>decision_maneger</name>
+  <name>decision_manager</name>
   <version>0.0.0</version>
-  <description>The decision_maneger package</description>
+  <description>The decision_manager package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/decision_maneger</url> -->
+  <!-- <url type="website">http://wiki.ros.org/decision_manager</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -56,6 +56,6 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <decision_maneger plugin="${prefix}/decision_manager_plugin.xml"/>
+    <decision_manager plugin="${prefix}/decision_manager_plugin.xml"/>
   </export>
 </package>

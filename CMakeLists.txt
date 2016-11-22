@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(decision_maneger)
+project(decision_manager)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -135,17 +135,17 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(decision_maneger
-#   src/${PROJECT_NAME}/decision_maneger.cpp
+# add_library(decision_manager
+#   src/${PROJECT_NAME}/decision_manager.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(decision_maneger ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(decision_manager ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(decision_maneger_node src/decision_maneger_node.cpp)
+# add_executable(decision_manager_node src/decision_manager_node.cpp)
 
 add_library(goal_manager_lib src/goal_manager.cpp)
 add_library(finding_tool_lib src/finding_tool.cpp)
@@ -153,10 +153,10 @@ add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 add_executable(task_listener_loader src/self-test/task_listener_loader.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(decision_maneger_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(decision_manager_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(decision_maneger_node
+# target_link_libraries(decision_manager_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -180,7 +180,7 @@ target_link_libraries(task_listener_loader ${catkin_LIBRARIES})
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS decision_maneger decision_maneger_node
+# install(TARGETS decision_manager decision_manager_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -205,7 +205,7 @@ target_link_libraries(task_listener_loader ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_decision_maneger.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_decision_manager.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

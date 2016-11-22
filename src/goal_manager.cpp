@@ -26,7 +26,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <decision_maneger/goal_manager.h>
+#include <decision_manager/goal_manager.h>
 #include <pluginlib/class_list_macros.h>
 #include <queue>
 #include <string>

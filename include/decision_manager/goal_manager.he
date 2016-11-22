@@ -30,7 +30,7 @@
 #ifndef INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 #define INCLUDE_DECISION_MANEGER_GOAL_MANAGER_H_
 
-#include <decision_maneger/task.h>
+#include <decision_manager/task.h>
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>

@@ -26,42 +26,36 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <boost/shared_ptr.hpp>
+#ifndef INCLUDE_DECISION_MANAGER_FINDING_TOOL_H_
+#define INCLUDE_DECISION_MANAGER_FINDING_TOOL_H_
 
-#include <pluginlib/class_loader.h>
-#include <std_msgs/Empty.h>
 #include <decision_manager/task.h>
+#include <laser_tool/FindShelf.h>
+#include <ros/ros.h>
+#include <std_msgs/String.h>
+#include <queue>
+#include <string>
+#include <vector>
 
-typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
-TaskPtr task_handle;
+namespace decision_manager_plugin {
 
-void TestRun(const std_msgs::Empty::ConstPtr& et) {
-  ROS_INFO_STREAM("run");
-  task_handle->Run();
-}
-
-void TestStop(const std_msgs::Empty::ConstPtr& et) {
-  ROS_INFO_STREAM("stop");
-  task_handle->Stop();
-}
-
-int main(int argc, char** argv) {
-  ros::init(argc, argv, "task_loader");
-  ros::NodeHandle nh;
-  ros::Subscriber run_sub = nh.subscribe("task_run", 1, TestRun);
-  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, TestStop);
-  pluginlib::ClassLoader<decision_manager::Task> task_loader(
-    "decision_manager", "decision_manager::Task");
-
-  try {
-    boost::shared_ptr<decision_manager::Task> test_task =
-      task_loader.createInstance("decision_manager_plugin::GoalManager");
-    test_task->Initialize(nh);
-    task_handle.reset(test_task.get());
-    ros::spin();
-  } catch(pluginlib::PluginlibException& ex) {
-    ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());  // NOLINT
-  }
-
-  return 0;
-}
+class FindingTool : public decision_manager::Task {
+ public:
+  FindingTool();
+  ~FindingTool();
+  // Fullfill Task interface
+  void Initialize(ros::NodeHandle n);
+  void Run();
+  void Stop();
+ private:
+  ros::NodeHandle nh_;
+  static const std::string kFindShelfServiceName_;
+  static const std::string kFindShelfSucceedCmd_;
+  ros::ServiceClient find_shelf_service_client_;
+  laser_tool::FindShelf finding_tool_srv_catcher_;
+  std::vector<std::string> shelf_location_;
+ private:
+  std::vector<std::string> StringSplit(std::string str, std::string pattern);
+};
+};  // namespace decision_manager_plugin
+#endif  // INCLUDE_DECISION_MANAGER_FINDING_TOOL_H_

@@ -26,42 +26,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <boost/shared_ptr.hpp>
 
-#include <pluginlib/class_loader.h>
-#include <std_msgs/Empty.h>
-#include <decision_manager/task.h>
-
-typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
-TaskPtr task_handle;
-
-void TestRun(const std_msgs::Empty::ConstPtr& et) {
-  ROS_INFO_STREAM("run");
-  task_handle->Run();
-}
-
-void TestStop(const std_msgs::Empty::ConstPtr& et) {
-  ROS_INFO_STREAM("stop");
-  task_handle->Stop();
-}
-
-int main(int argc, char** argv) {
-  ros::init(argc, argv, "task_loader");
-  ros::NodeHandle nh;
-  ros::Subscriber run_sub = nh.subscribe("task_run", 1, TestRun);
-  ros::Subscriber stop_sub = nh.subscribe("task_stop", 1, TestStop);
-  pluginlib::ClassLoader<decision_manager::Task> task_loader(
-    "decision_manager", "decision_manager::Task");
-
-  try {
-    boost::shared_ptr<decision_manager::Task> test_task =
-      task_loader.createInstance("decision_manager_plugin::GoalManager");
-    test_task->Initialize(nh);
-    task_handle.reset(test_task.get());
-    ros::spin();
-  } catch(pluginlib::PluginlibException& ex) {
-    ROS_ERROR("The plugin failed to load for some reason. Error: %s", ex.what());  // NOLINT
-  }
-
-  return 0;
-}
+#ifndef INCLUDE_DECISION_MANAGER_TASK_EXECUTOR_H_
+#define INCLUDE_DECISION_MANAGER_TASK_EXECUTOR_H_
+#endif  // INCLUDE_DECISION_MANAGER_TASK_EXECUTOR_H_

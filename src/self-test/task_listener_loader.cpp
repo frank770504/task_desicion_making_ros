@@ -26,7 +26,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <decision_maneger/task.h>
+#include <decision_manager/task.h>
 #include <boost/shared_ptr.hpp>
 
 #include <pluginlib/class_loader.h>
@@ -102,7 +102,7 @@ class TaskListenerLoadTEST : public decision_manager::TaskListener {
 
 const std::string TaskListenerLoadTEST::kRunSubName_ = "task_run";
 const std::string TaskListenerLoadTEST::kStopSubName_ = "task_stop";
-const std::string TaskListenerLoadTEST::kPluginPkgName_ = "decision_maneger";
+const std::string TaskListenerLoadTEST::kPluginPkgName_ = "decision_manager";
 const std::string TaskListenerLoadTEST::kPluginBaseClassName_ =
   "decision_manager::Task";
 const std::string TaskListenerLoadTEST::kPluginTaskClassName_ =

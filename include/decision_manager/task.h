@@ -26,11 +26,11 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef INCLUDE_DECISION_MANEGER_TASK_H_
-#define INCLUDE_DECISION_MANEGER_TASK_H_
+#ifndef INCLUDE_DECISION_MANAGER_TASK_H_
+#define INCLUDE_DECISION_MANAGER_TASK_H_
 
 #include <ros/ros.h>
-#include <decision_maneger/task_listener.h>
+#include <decision_manager/task_listener.h>
 #include <string>
 #include <vector>
 
@@ -104,4 +104,4 @@ class Task {
      TaskStatus taskStatus_;
 };
 }  // namespace decision_manager
-#endif  // INCLUDE_DECISION_MANEGER_TASK_H_
+#endif  // INCLUDE_DECISION_MANAGER_TASK_H_

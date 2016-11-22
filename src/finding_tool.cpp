@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <decision_maneger/finding_tool.h>
+#include <decision_manager/finding_tool.h>
 #include <pluginlib/class_list_macros.h>
 #include <string>
 #include <vector>

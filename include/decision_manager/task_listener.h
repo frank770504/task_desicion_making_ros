@@ -26,36 +26,35 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_
-#define INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_
 
-#include <decision_maneger/task.h>
-#include <laser_tool/FindShelf.h>
-#include <ros/ros.h>
-#include <std_msgs/String.h>
-#include <queue>
-#include <string>
-#include <vector>
+#ifndef INCLUDE_DECISION_MANAGER_TASK_LISTENER_H_
+#define INCLUDE_DECISION_MANAGER_TASK_LISTENER_H_
 
-namespace decision_manager_plugin {
+namespace decision_manager {
 
-class FindingTool : public decision_manager::Task {
+enum {
+  OnTaskCompleteID,
+  OnTaskCancelledID,
+  OnTaskFailedID,
+  OnTaskStoppedID,
+  OnGoalControlID
+} CallbackID;
+
+class Task;
+
+class TaskListener {
  public:
-  FindingTool();
-  ~FindingTool();
-  // Fullfill Task interface
-  void Initialize(ros::NodeHandle n);
-  void Run();
-  void Stop();
- private:
-  ros::NodeHandle nh_;
-  static const std::string kFindShelfServiceName_;
-  static const std::string kFindShelfSucceedCmd_;
-  ros::ServiceClient find_shelf_service_client_;
-  laser_tool::FindShelf finding_tool_srv_catcher_;
-  std::vector<std::string> shelf_location_;
- private:
-  std::vector<std::string> StringSplit(std::string str, std::string pattern);
+  virtual ~TaskListener() {
+  }
+
+  virtual void OnTaskComplete(Task& task) = 0;
+  virtual void OnTaskCancelled(Task& task) = 0;
+  virtual void OnTaskFailed(Task& task) = 0;
+  virtual void OnTaskStopped(Task& task) = 0;
+  virtual void OnGoalControl(Task& task) = 0;
 };
-};  // namespace decision_manager_plugin
-#endif  // INCLUDE_DECISION_MANEGER_FINDING_TOOL_H_
+
+typedef boost::shared_ptr<TaskListener> TaskListenerPtr;
+}  // namespace decision_manager
+
+#endif  // INCLUDE_DECISION_MANAGER_TASK_LISTENER_H_

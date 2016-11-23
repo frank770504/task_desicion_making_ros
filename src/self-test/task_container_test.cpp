@@ -33,6 +33,7 @@
 #include <std_msgs/Empty.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class TaskListenerLoadTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;

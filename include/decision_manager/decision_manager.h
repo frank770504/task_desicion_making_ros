@@ -39,6 +39,7 @@
 #include <std_msgs/String.h>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace decision_manager {
 class DecisionManager : public TaskListener {

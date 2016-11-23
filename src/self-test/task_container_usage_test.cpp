@@ -34,6 +34,7 @@
 #include <std_msgs/Empty.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class TaskContainerUsageTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;

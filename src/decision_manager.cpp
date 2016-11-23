@@ -28,12 +28,15 @@
  */
 
 #include <decision_manager/decision_manager.h>
+#include <string>
+#include <vector>
 
 namespace decision_manager {
 
 const std::string DecisionManager::kCmdSubName_ = "task_cmd";
 
-DecisionManager::DecisionManager(ros::NodeHandle n) : nh_(n), task_container_(n) {
+DecisionManager::DecisionManager(ros::NodeHandle n)
+  : nh_(n), task_container_(n) {
   web_cmd_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
     boost::bind(&DecisionManager::WebCmdCallback, this, _1));
   task_container_.SetTasksListener(TaskListenerPtr(this));

@@ -54,4 +54,4 @@ void TaskExecutor::PostTask(const TaskPtr& taskPtr, int execute_index) {
     ioService_.post(boost::bind(&Task::Stop, taskPtr.get()));
   }
 }
-};  // namesaoce decision_manager
+};  // namespace decision_manager

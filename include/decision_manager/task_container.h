@@ -34,6 +34,7 @@
 #include <pluginlib/class_loader.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #ifndef INCLUDE_DECISION_MANAGER_TASK_CONTAINER_H_
 #define INCLUDE_DECISION_MANAGER_TASK_CONTAINER_H_
@@ -56,6 +57,7 @@ class TaskContainer {
     return task_map_handle_list_;
   }
   void SetTasksListener(const TaskListenerPtr& listener);
+
  private:
   ros::NodeHandle nh_;
   boost::shared_ptr<PluginLoader> task_loader_;

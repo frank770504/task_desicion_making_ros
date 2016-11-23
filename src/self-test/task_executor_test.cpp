@@ -33,7 +33,6 @@
 #include <boost/thread.hpp>
 #include <boost/asio/io_service.hpp>
 
-#include <pluginlib/class_loader.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/String.h>
 #include <string>
@@ -52,7 +51,7 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
       boost::bind(&TaskExecutorTEST::RunCb, this, _1));
     stop_sub_ = nh_.subscribe<std_msgs::Empty>(kStopSubName_, 1,
       boost::bind(&TaskExecutorTEST::StopCb, this, _1));
-    stop_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
+    cmd_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
       boost::bind(&TaskExecutorTEST::CmdCb, this, _1));
     task_container_.SetTasksListener(decision_manager::TaskListenerPtr(this));
   }

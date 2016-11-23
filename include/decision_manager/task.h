@@ -35,6 +35,12 @@
 #include <vector>
 
 namespace decision_manager {
+
+enum TaskExecuteIndex {
+  TASK_RUN,
+  TASK_STOP
+};
+
 class TaskStatus {
  public:
   TaskStatus()

@@ -56,7 +56,7 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
     TaskMap::const_iterator titer = _map.begin();
     for (; titer != _map.end(); ++titer) {
       ROS_INFO_STREAM((titer->second)->GetTaskName() << ": run");
-      task_executor_.PostTask((titer->second));
+      task_executor_.PostTask((titer->second), decision_manager::TASK_RUN);
       //~ (titer->second)->Run();
     }
   }
@@ -65,7 +65,8 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
     TaskMap::const_iterator titer = _map.begin();
     for (; titer != _map.end(); ++titer) {
       ROS_INFO_STREAM((titer->second)->GetTaskName() << ": stop");
-      (titer->second)->Stop();
+      task_executor_.PostTask((titer->second), decision_manager::TASK_STOP);
+      //~ (titer->second)->Stop();
     }
   }
   virtual void OnTaskComplete(decision_manager::Task& task) {

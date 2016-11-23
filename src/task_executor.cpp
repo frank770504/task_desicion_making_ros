@@ -26,3 +26,32 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#include <decision_manager/task_executor.h>
+
+namespace decision_manager {
+
+const int TaskExecutor::kCore_divide_factor = 4;
+
+TaskExecutor::TaskExecutor()
+  : workPtr_(new boost::asio::io_service::work(ioService_)) {
+  unsigned int nthreads = boost::thread::hardware_concurrency()
+      / kCore_divide_factor;  // NOLINT
+  while (nthreads--) {
+    thread_group_.create_thread(
+        boost::bind(&boost::asio::io_service::run, &ioService_));
+  }
+}
+TaskExecutor::~TaskExecutor() {
+  workPtr_.reset();
+  thread_group_.join_all();
+  ioService_.stop();
+}
+void TaskExecutor::PostTask(const TaskPtr& taskPtr, int execute_index) {
+  if (execute_index == TASK_RUN) {
+    ioService_.post(boost::bind(&Task::Run, taskPtr.get()));
+  } else if (execute_index == TASK_STOP) {
+    ioService_.post(boost::bind(&Task::Stop, taskPtr.get()));
+  }
+}
+};  // namesaoce decision_manager

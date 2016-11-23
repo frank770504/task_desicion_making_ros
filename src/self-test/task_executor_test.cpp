@@ -28,6 +28,7 @@
  */
 #include <decision_manager/task.h>
 #include <decision_manager/task_container.h>
+#include <decision_manager/task_executor.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio/io_service.hpp>
@@ -36,37 +37,6 @@
 #include <std_msgs/Empty.h>
 #include <string>
 #include <vector>
-
-namespace decision_manager {
-class TaskExecutor {
- public:
-  TaskExecutor()
-    : workPtr_(new boost::asio::io_service::work(ioService_)) {
-  unsigned int nthreads = boost::thread::hardware_concurrency()
-      / kCore_divide_factor;  // NOLINT
-  while (nthreads--) {
-    thread_group_.create_thread(
-        boost::bind(&boost::asio::io_service::run, &ioService_));
-  }
-}
-  ~TaskExecutor() {
-    workPtr_.reset();
-    thread_group_.join_all();
-    ioService_.stop();
-  }
-  void PostTask(const TaskPtr& taskPtr);
- private:
-  static const int kCore_divide_factor;
-  typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;
-  boost::asio::io_service ioService_;
-  WorkPtr workPtr_;
-  boost::thread_group thread_group_;
-};
-const int TaskExecutor::kCore_divide_factor = 4;
-void TaskExecutor::PostTask(const TaskPtr& taskPtr) {
-  ioService_.post(boost::bind(&Task::Run, taskPtr.get()));
-}
-};  // namespace decision_manager
 
 class TaskExecutorTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;

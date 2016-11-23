@@ -19,6 +19,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 roslint_cpp()
 
+file(GLOB PROJECT_SRC
+"src/*.cpp"
+)
+
 # check c++11 / c++0x
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -147,8 +151,9 @@ include_directories(
 ## Declare a C++ executable
 # add_executable(decision_manager_node src/decision_manager_node.cpp)
 
-add_library(goal_manager_lib src/goal_manager.cpp)
-add_library(finding_tool_lib src/finding_tool.cpp)
+add_library(goal_manager_lib src/tasklib/goal_manager.cpp)
+add_library(finding_tool_lib src/tasklib/finding_tool.cpp)
+add_executable(decision_manager ${PROJECT_SRC})
 add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 add_executable(task_listener_loader src/self-test/task_listener_loader.cpp)
 add_executable(task_container_test src/self-test/task_container_test.cpp)
@@ -163,6 +168,7 @@ add_executable(task_executor_test src/self-test/task_executor_test.cpp src/task_
 #   ${catkin_LIBRARIES}
 # )
 
+target_link_libraries(decision_manager ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_lib ${catkin_LIBRARIES})
 target_link_libraries(finding_tool_lib ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_loader ${catkin_LIBRARIES})

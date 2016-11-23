@@ -41,6 +41,9 @@ enum TaskExecuteIndex {
   TASK_STOP
 };
 
+static const std::string kTaskCmdRun = "task.execute.run";
+static const std::string kTaskCmdStop = "task.execute.stop";
+
 class TaskStatus {
  public:
   TaskStatus()

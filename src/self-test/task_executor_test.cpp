@@ -35,8 +35,11 @@
 
 #include <pluginlib/class_loader.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/String.h>
 #include <string>
 #include <vector>
+
+// command: "task_name task_command"
 
 class TaskExecutorTEST : public decision_manager::TaskListener {
   typedef boost::shared_ptr<decision_manager::Task> TaskPtr;
@@ -49,6 +52,8 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
       boost::bind(&TaskExecutorTEST::RunCb, this, _1));
     stop_sub_ = nh_.subscribe<std_msgs::Empty>(kStopSubName_, 1,
       boost::bind(&TaskExecutorTEST::StopCb, this, _1));
+    stop_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
+      boost::bind(&TaskExecutorTEST::CmdCb, this, _1));
     task_container_.SetTasksListener(decision_manager::TaskListenerPtr(this));
   }
   void RunCb(const std_msgs::Empty::ConstPtr& et) {
@@ -69,6 +74,40 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
       //~ (titer->second)->Stop();
     }
   }
+  std::vector<std::string> StringSplit(std::string str, std::string pattern) {
+    std::string::size_type pos;
+    std::vector<std::string> result;
+    str += pattern;
+    int size = str.size();
+    for (int i = 0; i < size; i++) {
+      pos = str.find(pattern, i);
+      if (pos < size) {
+        std::string s = str.substr(i, pos - i);
+        result.push_back(s);
+        i = pos + pattern.size() - 1;
+      }
+    }
+    return result;
+  }
+  void CmdCb(const std_msgs::String::ConstPtr& str) {
+    std::vector<std::string> cmd = StringSplit(str->data, " ");
+    ROS_INFO_STREAM("recived command: " << "\"" << str->data << "\"");
+    decision_manager::TaskPtr task_ptr = task_container_.GetTask(cmd[0]);
+    if (task_ptr != decision_manager::NullPtr) {
+      if (cmd[1] == decision_manager::kTaskCmdRun) {
+        ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run using cmd");
+        task_executor_.PostTask(task_ptr, decision_manager::TASK_RUN);
+      } else if (cmd[1] == decision_manager::kTaskCmdStop) {
+        ROS_INFO_STREAM(task_ptr->GetTaskName() << ": stop using cmd");
+        task_executor_.PostTask(task_ptr, decision_manager::TASK_STOP);
+      } else {
+        ROS_INFO_STREAM(cmd[1]
+          << " is a wrong command in task: " << task_ptr->GetTaskName());
+      }
+    } else {
+      ROS_INFO_STREAM(cmd[0] << " is a wrong task name");
+    }
+  }
   virtual void OnTaskComplete(decision_manager::Task& task) {
   }
   virtual void OnTaskCancelled(decision_manager::Task& task) {
@@ -85,14 +124,17 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
   ros::NodeHandle nh_;
   ros::Subscriber run_sub_;
   ros::Subscriber stop_sub_;
+  ros::Subscriber cmd_sub_;
   static const std::string kRunSubName_;
   static const std::string kStopSubName_;
+  static const std::string kCmdSubName_;
   decision_manager::TaskContainer task_container_;
   decision_manager::TaskExecutor task_executor_;
 };
 
 const std::string TaskExecutorTEST::kRunSubName_ = "task_run";
 const std::string TaskExecutorTEST::kStopSubName_ = "task_stop";
+const std::string TaskExecutorTEST::kCmdSubName_ = "task_cmd";
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "task_container_usage_test");

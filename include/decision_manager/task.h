@@ -72,7 +72,7 @@ class Task {
        taskListeners_.push_back(ptr);
      }
      // TODO(FrankChen): add defined command
-     void OnListenerCaller(Task& task, int func_id) {
+     void OnTaskEventCaller(Task& task, int func_id) {
        std::vector<TaskListenerPtr>::iterator iter = taskListeners_.begin();
        for (; iter != taskListeners_.end(); ++iter) {
           if (func_id == OnTaskCompleteID) {
@@ -83,9 +83,13 @@ class Task {
             (*iter)->OnTaskFailed(task);
           } else if (func_id == OnTaskStoppedID) {
             (*iter)->OnTaskStopped(task);
-          } else if (func_id == OnGoalControlID) {
-            (*iter)->OnGoalControl(task);
           }
+       }
+     }
+     void OnGoalEventCaller(Task& task) {
+       std::vector<TaskListenerPtr>::iterator iter = taskListeners_.begin();
+       for (; iter != taskListeners_.end(); ++iter) {
+            (*iter)->OnGoalEvent(task);
        }
      }
      virtual void Run() = 0;

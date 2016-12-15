@@ -36,9 +36,8 @@ enum {
   OnTaskCompleteID,
   OnTaskCancelledID,
   OnTaskFailedID,
-  OnTaskStoppedID,
-  OnGoalControlID
-} CallbackID;
+  OnTaskStoppedID
+} TaskEventCallbackID;
 
 class Task;
 
@@ -51,7 +50,7 @@ class TaskListener {
   virtual void OnTaskCancelled(Task& task) = 0;
   virtual void OnTaskFailed(Task& task) = 0;
   virtual void OnTaskStopped(Task& task) = 0;
-  virtual void OnGoalControl(Task& task) = 0;
+  virtual void OnGoalEvent(Task& task) = 0;
 };
 
 typedef boost::shared_ptr<TaskListener> TaskListenerPtr;

@@ -79,7 +79,7 @@ void DecisionManager::OnTaskFailed(Task& task) {
 }
 void DecisionManager::OnTaskStopped(Task& task) {
 }
-void DecisionManager::OnGoalControl(Task& task) {
+void DecisionManager::OnGoalEvent(Task& task) {
   ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener)");
 }
 

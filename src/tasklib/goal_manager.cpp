@@ -124,7 +124,8 @@ void GoalManager::WaitGoalReaching() {
     } else {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
     }
-    OnListenerCaller(*this, decision_manager::OnGoalControlID);
+    //~ OnTaskEventCaller(*this, decision_manager::OnGoalControlID);
+    OnGoalEventCaller(*this);
     cond_.notify_all();
 }
 

@@ -54,7 +54,7 @@ class DecisionManager : public TaskListener {
   virtual void OnTaskCancelled(Task& task);
   virtual void OnTaskFailed(Task& task);
   virtual void OnTaskStopped(Task& task);
-  virtual void OnGoalControl(Task& task);
+  virtual void OnGoalEvent(Task& task);
 
  private:
   std::vector<std::string> StringSplit(std::string str, std::string pattern);

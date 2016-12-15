@@ -44,7 +44,6 @@ const std::string TaskContainer::kPluginTypeNamespaceKey_ =
 const std::string TaskContainer::kPluginUsedTaskListKey_ =
   kPluginPkgName_ + "/used_task_list";
 
-const std::string TaskContainer::kTaskNameKey_ = "task_name";
 const std::string TaskContainer::kTaskCanStopKey_ = "can_stop";
 const std::string TaskContainer::kTaskCanCancelKey_ = "can_cancel";
 
@@ -86,7 +85,7 @@ TaskContainer::TaskContainer(ros::NodeHandle n)
       } else {
         // TODO(FrankChen): Initialized time-out
         (titer->second)->Initialize(nh_,
-                                    yml_params_[kTaskNameKey_],
+                                    (titer->first),
                                     yml_params_[kTaskCanStopKey_],
                                     yml_params_[kTaskCanCancelKey_]);
         ROS_INFO_STREAM((titer->second)->GetTaskName() << ": is initialized.");

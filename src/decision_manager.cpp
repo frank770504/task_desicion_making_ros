@@ -40,6 +40,11 @@ DecisionManager::DecisionManager(ros::NodeHandle n)
   web_cmd_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
     boost::bind(&DecisionManager::WebCmdCallback, this, _1));
   task_container_.SetTasksListener(TaskListenerPtr(this));
+  tasks_map_ = task_container_.GetTasks();
+  TaskMap::const_iterator titer = tasks_map_.begin();
+  for (; titer != tasks_map_.end(); ++titer) {
+    task_wait_list_.push_back(titer->first);
+  }
 }
 
 void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {

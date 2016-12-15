@@ -65,6 +65,9 @@ class DecisionManager : public TaskListener {
   static const std::string kCmdSubName_;
   TaskContainer task_container_;
   TaskExecutor task_executor_;
+ private:
+  std::vector<std::string> task_wait_list_;
+  TaskMap tasks_map_;
 };
 };  // namespace decision_manager
 

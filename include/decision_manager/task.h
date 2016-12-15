@@ -60,6 +60,39 @@ class TaskStatus {
   bool is_able_to_cancel_;
 };  // TODO(FrankChen) define structure.
 
+static const std::string kTaskCommandRun = "task.command.run";
+static const std::string kTaskCommandStop = "task.command.stop";
+static const std::string kTaskCommandUntil = "task.command.until";
+
+class TaskCommand {
+ public:
+  TaskCommand() {}
+  TaskCommand& RunTask(std::string task_name) {
+    command_ = kTaskCommandRun;
+    task_name_ = task_name;
+    return *this;
+  }
+  TaskCommand& StopTask(std::string task_name) {
+    command_ = kTaskCommandStop;
+    task_name_ = task_name;
+    return *this;
+  }
+  TaskCommand& StopSelfUntil(std::string task_name) {
+    command_ = kTaskCommandUntil;
+    task_name_ = task_name;
+    return *this;
+  }
+  const std::string& GetTaskName() const  {
+   return task_name_;
+  }
+  const std::string& GetCommand() const  {
+   return command_;
+  }
+ private:
+  std::string command_;
+  std::string task_name_;
+};
+
 class Task {
  public:
      const TaskStatus& GetTaskState() const {
@@ -86,10 +119,10 @@ class Task {
           }
        }
      }
-     void OnGoalEventCaller(Task& task) {
+     void OnGoalEventCaller(Task& task, TaskCommand& cmd) {
        std::vector<TaskListenerPtr>::iterator iter = taskListeners_.begin();
        for (; iter != taskListeners_.end(); ++iter) {
-            (*iter)->OnGoalEvent(task);
+            (*iter)->OnGoalEvent(task, cmd);
        }
      }
      virtual void Run() = 0;
@@ -111,6 +144,7 @@ class Task {
 
  protected:
      std::vector<TaskListenerPtr> taskListeners_;
+     TaskCommand taskCommand_;
 
  private:
      std::string taskName_;

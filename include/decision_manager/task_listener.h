@@ -40,6 +40,7 @@ enum {
 } TaskEventCallbackID;
 
 class Task;
+class TaskCommand;
 
 class TaskListener {
  public:
@@ -50,7 +51,7 @@ class TaskListener {
   virtual void OnTaskCancelled(Task& task) = 0;
   virtual void OnTaskFailed(Task& task) = 0;
   virtual void OnTaskStopped(Task& task) = 0;
-  virtual void OnGoalEvent(Task& task) = 0;
+  virtual void OnGoalEvent(Task& task, TaskCommand& cmd) = 0;
 };
 
 typedef boost::shared_ptr<TaskListener> TaskListenerPtr;

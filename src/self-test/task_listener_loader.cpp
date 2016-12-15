@@ -82,7 +82,8 @@ class TaskContainerTEST : public decision_manager::TaskListener {
   }
   virtual void OnTaskStopped(decision_manager::Task& task) {
   }
-  virtual void OnGoalEvent(decision_manager::Task& task) {
+  virtual void OnGoalEvent(decision_manager::Task& task,
+                           decision_manager::TaskCommand& cmd) {
     ROS_INFO_STREAM(task.GetTaskName() << ": has been called");
   }
 

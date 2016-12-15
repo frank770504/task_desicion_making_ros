@@ -84,8 +84,10 @@ void DecisionManager::OnTaskFailed(Task& task) {
 }
 void DecisionManager::OnTaskStopped(Task& task) {
 }
-void DecisionManager::OnGoalEvent(Task& task) {
-  ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener)");
+void DecisionManager::OnGoalEvent(Task& task, TaskCommand& cmd) {
+  ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener hero)");
+  ROS_INFO_STREAM(cmd.GetCommand() << ": has been set (listener command)");
+  ROS_INFO_STREAM(cmd.GetTaskName() << ": has been called (listener sidekick)");
 }
 
 std::vector<std::string> DecisionManager::StringSplit(

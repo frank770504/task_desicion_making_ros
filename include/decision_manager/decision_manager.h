@@ -58,6 +58,7 @@ class DecisionManager : public TaskListener {
 
  private:
   std::vector<std::string> StringSplit(std::string str, std::string pattern);
+  void DecisionListChecking(const TaskPtr& taskPtr);
   void DecisionMaking();
   ros::NodeHandle nh_;
   ros::Subscriber web_cmd_sub_;
@@ -67,6 +68,7 @@ class DecisionManager : public TaskListener {
   TaskExecutor task_executor_;
  private:
   std::vector<std::string> task_wait_list_;
+  std::vector<std::string> task_exec_list_;
   TaskMap tasks_map_;
 };
 };  // namespace decision_manager

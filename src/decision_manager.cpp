@@ -56,6 +56,7 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
     if (cmd[1] == kTaskCommandRun) {
       ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run");
       task_executor_.PostTask(task_ptr, TASK_RUN);
+      task_ptr->SetTaskStatus(kTaskStatusRun);
     } else if (cmd[1] == kTaskCommandStop) {
       TaskStatus ts = task_ptr->GetTaskState();
       if (!ts.IsStoppable()) {
@@ -63,13 +64,28 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
       } else {
         ROS_INFO_STREAM(task_ptr->GetTaskName() << ": stop");
         task_executor_.PostTask(task_ptr, TASK_STOP);
+        // it is set in OnTaskComplete()
+        // task_ptr->SetTaskStatus(kTaskStatusStop);
       }
     } else {
       ROS_INFO_STREAM(cmd[1]
         << " is a wrong command in task: " << task_ptr->GetTaskName());
     }
+    DecisionListChecking(task_ptr);
   } else {
     ROS_INFO_STREAM(cmd[0] << " is a wrong task name");
+  }
+}
+
+void DecisionManager::DecisionListChecking(const TaskPtr& taskPtr) {
+  ROS_INFO_STREAM(taskPtr->GetTaskStatus()
+    << " is the status of task: " << taskPtr->GetTaskName());
+  if (taskPtr->GetTaskStatus() == kTaskStatusRun) {
+  } else if (taskPtr->GetTaskStatus() == kTaskStatusStop) {
+  } else if (taskPtr->GetTaskStatus() == kTaskStatusUntil) {
+  } else {
+    ROS_INFO_STREAM(taskPtr->GetTaskStatus()
+      << " is a wrong status of task: " << taskPtr->GetTaskName());
   }
 }
 
@@ -77,6 +93,8 @@ void DecisionManager::DecisionMaking() {
 }
 
 void DecisionManager::OnTaskComplete(Task& task) {
+  task.SetTaskStatus(kTaskStatusStop);
+  DecisionListChecking(task_container_.GetTask(task.GetTaskName()));
 }
 void DecisionManager::OnTaskCancelled(Task& task) {
 }

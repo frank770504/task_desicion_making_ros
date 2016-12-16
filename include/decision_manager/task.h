@@ -41,20 +41,38 @@ enum TaskExecuteIndex {
   TASK_STOP
 };
 
+static const std::string kTaskStatusRun = "task.status.run";
+static const std::string kTaskStatusStop = "task.status.stop";
+static const std::string kTaskStatusUntil = "task.status.until";
+
 class TaskStatus {
  public:
   TaskStatus()
     : is_stoppable_(false),
       is_able_to_cancel_(false) {
   }
+  void SetStoppableFlag(bool st) {
+    is_stoppable_ = st;
+  }
   bool IsStoppable() {
     return is_stoppable_;
+  }
+  void SetAbleToCancelFlag(bool st) {
+    is_able_to_cancel_ = st;
   }
   bool IsAbleToCancel() {
     return is_able_to_cancel_;
   }
+  void SetTaskStatus(const std::string& st) {
+    status_ = st;
+  }
+  const std::string& GetTaskStatus() {
+    return status_;
+  }
+ private:
   bool is_stoppable_;
   bool is_able_to_cancel_;
+  std::string status_;
 };  // TODO(FrankChen) define structure.
 
 static const std::string kTaskCommandRun = "task.command.run";
@@ -122,6 +140,12 @@ class Task {
             (*iter)->OnGoalEvent(task, cmd);
        }
      }
+     void SetTaskStatus(const std::string& st) {
+       taskStatus_.SetTaskStatus(st);
+     }
+     const std::string& GetTaskStatus() {
+       return taskStatus_.GetTaskStatus();
+     }
      virtual void Run() = 0;
      virtual void Stop() = 0;
      virtual void Initialize(ros::NodeHandle n, std::string task_name,
@@ -134,8 +158,8 @@ class Task {
        taskName_ = name;
      }
      void SetTaskStateBool(bool can_stop, bool can_cancel) {
-       taskStatus_.is_stoppable_ = can_stop;
-       taskStatus_.is_able_to_cancel_ = can_cancel;
+       taskStatus_.SetStoppableFlag(can_stop);
+       taskStatus_.SetAbleToCancelFlag(can_cancel);
      }
      void ExecuteInner();
 

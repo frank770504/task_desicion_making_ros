@@ -43,7 +43,6 @@ enum TaskExecuteIndex {
 
 static const std::string kTaskStatusRun = "task.status.run";
 static const std::string kTaskStatusStop = "task.status.stop";
-static const std::string kTaskStatusUntil = "task.status.until";
 
 class TaskStatus {
  public:
@@ -76,7 +75,7 @@ class TaskStatus {
 };  // TODO(FrankChen) define structure.
 
 static const std::string kTaskCommandRun = "task.command.run";
-static const std::string kTaskCommandStop = "task.command.stop";
+static const std::string kTaskCommandWait = "task.command.wait";
 static const std::string kTaskCommandUntil = "task.command.until";
 
 class TaskCommand {
@@ -88,7 +87,7 @@ class TaskCommand {
     return *this;
   }
   TaskCommand& StopTask(std::string task_name) {
-    command_ = kTaskCommandStop;
+    command_ = kTaskCommandWait;
     task_name_ = task_name;
     return *this;
   }

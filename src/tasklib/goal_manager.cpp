@@ -255,6 +255,7 @@ void GoalManager::Stop() {
   }
   ROS_INFO_STREAM("task stop!");
   action_client_->cancelAllGoals();
+  OnTaskEventCaller(*this, decision_manager::OnTaskCompleteID);
 }
 };  // namespace decision_manager_plugin
 

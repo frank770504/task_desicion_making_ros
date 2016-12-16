@@ -97,7 +97,7 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
       if (cmd[1] == decision_manager::kTaskCommandRun) {
         ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run using cmd");
         task_executor_.PostTask(task_ptr, decision_manager::TASK_RUN);
-      } else if (cmd[1] == decision_manager::kTaskCommandStop) {
+      } else if (cmd[1] == decision_manager::kTaskCommandWait) {
         ROS_INFO_STREAM(task_ptr->GetTaskName() << ": stop using cmd");
         task_executor_.PostTask(task_ptr, decision_manager::TASK_STOP);
       } else {

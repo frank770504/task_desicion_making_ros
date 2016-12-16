@@ -55,9 +55,10 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
   if (task_ptr != NullPtr) {
     if (cmd[1] == kTaskCommandRun) {
       ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run");
-      task_executor_.PostTask(task_ptr, TASK_RUN);
-      task_ptr->SetTaskStatus(kTaskStatusRun);
-    } else if (cmd[1] == kTaskCommandStop) {
+      task_executor_.PostTask(task_ptr, TASK_RUN);  // 1: two lines group
+      task_ptr->SetTaskStatus(kTaskStatusRun);  // 2: two lines group
+      DecisionListChecking(task_ptr);
+    } else if (cmd[1] == kTaskCommandWait) {
       TaskStatus ts = task_ptr->GetTaskState();
       if (!ts.IsStoppable()) {
         ROS_WARN_STREAM(task_ptr->GetTaskName() << " cannot stop");
@@ -71,41 +72,83 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
       ROS_INFO_STREAM(cmd[1]
         << " is a wrong command in task: " << task_ptr->GetTaskName());
     }
-    DecisionListChecking(task_ptr);
   } else {
     ROS_INFO_STREAM(cmd[0] << " is a wrong task name");
   }
 }
 
 void DecisionManager::DecisionListChecking(const TaskPtr& taskPtr) {
+ROS_INFO_STREAM(__FUNCTION__ << " ================================");
   ROS_INFO_STREAM(taskPtr->GetTaskStatus()
     << " is the status of task: " << taskPtr->GetTaskName());
+  std::vector<std::string>::iterator exec_it;
+  std::vector<std::string>::iterator wait_it;
+  exec_it = std::find(
+    task_exec_list_.begin(), task_exec_list_.end(), taskPtr->GetTaskName());
+  wait_it = std::find(
+    task_wait_list_.begin(), task_wait_list_.end(), taskPtr->GetTaskName());
   if (taskPtr->GetTaskStatus() == kTaskStatusRun) {
+    if (exec_it == task_exec_list_.end()) {
+      // if not in task_exec_list_ then join in
+      task_exec_list_.push_back(taskPtr->GetTaskName());
+    }  // if in task_exec_list_ do nothing
+    if (wait_it != task_wait_list_.end()) {
+      // if in task_wait_list_ then remove out
+      task_wait_list_.erase(wait_it);
+    }  // if not in task_wait_list_ do nothing
   } else if (taskPtr->GetTaskStatus() == kTaskStatusStop) {
-  } else if (taskPtr->GetTaskStatus() == kTaskStatusUntil) {
+    if (exec_it != task_exec_list_.end()) {
+      // if in task_exec_list_ then remove outs
+      task_exec_list_.erase(exec_it);
+    }  // if not in task_exec_list_ do nothing
+    if (wait_it == task_wait_list_.end()) {
+      // if not in task_wait_list_ then join in
+      task_wait_list_.push_back(taskPtr->GetTaskName());
+    }  // if in task_wait_list_ do nothing
   } else {
     ROS_INFO_STREAM(taskPtr->GetTaskStatus()
       << " is a wrong status of task: " << taskPtr->GetTaskName());
   }
+  ROS_INFO_STREAM("task_exec_list_, after manuplating task: "
+                  << taskPtr->GetTaskName());
+  for (int i = 0; i < task_exec_list_.size(); i++) {
+    ROS_INFO_STREAM(task_exec_list_[i]);
+  }
+  ROS_INFO_STREAM("task_wait_list_, after manuplating task: "
+                  << taskPtr->GetTaskName());
+  for (int i = 0; i < task_wait_list_.size(); i++) {
+    ROS_INFO_STREAM(task_wait_list_[i]);
+  }
+ROS_INFO_STREAM("=====================================");
 }
 
 void DecisionManager::DecisionMaking() {
 }
 
 void DecisionManager::OnTaskComplete(Task& task) {
+ROS_INFO_STREAM(__FUNCTION__);
   task.SetTaskStatus(kTaskStatusStop);
   DecisionListChecking(task_container_.GetTask(task.GetTaskName()));
+ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnTaskCancelled(Task& task) {
+ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnTaskFailed(Task& task) {
+ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnTaskStopped(Task& task) {
+ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnGoalEvent(Task& task, TaskCommand& cmd) {
+ROS_INFO_STREAM(__FUNCTION__ << " ================================");
   ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener hero)");
   ROS_INFO_STREAM(cmd.GetCommand() << ": has been set (listener command)");
   ROS_INFO_STREAM(cmd.GetTaskName() << ": has been called (listener sidekick)");
+ROS_INFO_STREAM("=====================================");
 }
 
 std::vector<std::string> DecisionManager::StringSplit(

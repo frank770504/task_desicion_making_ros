@@ -125,7 +125,8 @@ void GoalManager::WaitGoalReaching() {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
     }
     //~ OnTaskEventCaller(*this, decision_manager::OnGoalControlID);
-    OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+    //~ OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+    OnGoalEventCaller(*this, taskCommand_.StopTask(this->GetTaskName()));
     cond_.notify_all();
 }
 

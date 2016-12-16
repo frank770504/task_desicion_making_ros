@@ -164,6 +164,7 @@ ROS_INFO_STREAM(__FUNCTION__ << " ================================");
   ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener hero)");
   ROS_INFO_STREAM(cmd.GetCommand() << ": has been set (listener command)");
   ROS_INFO_STREAM(cmd.GetTaskName() << ": has been called (listener sidekick)");
+  DecisionMaking(cmd);
 ROS_INFO_STREAM("=====================================");
 }
 

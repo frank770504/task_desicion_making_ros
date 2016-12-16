@@ -59,7 +59,7 @@ class DecisionManager : public TaskListener {
  private:
   std::vector<std::string> StringSplit(std::string str, std::string pattern);
   void DecisionListChecking(const TaskPtr& taskPtr);
-  void DecisionMaking();
+  void DecisionMaking(TaskCommand& cmd, const TaskPtr& taskPtr = NullPtr);
   ros::NodeHandle nh_;
   ros::Subscriber web_cmd_sub_;
   ros::Subscriber inner_cmd_sub_;

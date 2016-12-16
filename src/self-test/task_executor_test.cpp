@@ -94,10 +94,10 @@ class TaskExecutorTEST : public decision_manager::TaskListener {
     ROS_INFO_STREAM("recived command: " << "\"" << str->data << "\"");
     decision_manager::TaskPtr task_ptr = task_container_.GetTask(cmd[0]);
     if (task_ptr != decision_manager::NullPtr) {
-      if (cmd[1] == decision_manager::kTaskCmdRun) {
+      if (cmd[1] == decision_manager::kTaskCommandRun) {
         ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run using cmd");
         task_executor_.PostTask(task_ptr, decision_manager::TASK_RUN);
-      } else if (cmd[1] == decision_manager::kTaskCmdStop) {
+      } else if (cmd[1] == decision_manager::kTaskCommandStop) {
         ROS_INFO_STREAM(task_ptr->GetTaskName() << ": stop using cmd");
         task_executor_.PostTask(task_ptr, decision_manager::TASK_STOP);
       } else {

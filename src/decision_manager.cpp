@@ -53,10 +53,10 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
   TaskPtr task_ptr = task_container_.GetTask(cmd[0]);
   // TODO(FrankChen): Task state/depends check (for what??)
   if (task_ptr != NullPtr) {
-    if (cmd[1] == kTaskCmdRun) {
+    if (cmd[1] == kTaskCommandRun) {
       ROS_INFO_STREAM(task_ptr->GetTaskName() << ": run");
       task_executor_.PostTask(task_ptr, TASK_RUN);
-    } else if (cmd[1] == kTaskCmdStop) {
+    } else if (cmd[1] == kTaskCommandStop) {
       TaskStatus ts = task_ptr->GetTaskState();
       if (!ts.IsStoppable()) {
         ROS_WARN_STREAM(task_ptr->GetTaskName() << " cannot stop");

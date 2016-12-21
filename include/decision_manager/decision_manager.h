@@ -67,6 +67,9 @@ class DecisionManager : public TaskListener {
   static const std::string kCmdSubName_;
   TaskContainer task_container_;
   TaskExecutor task_executor_;
+  bool is_until_command_flag_;
+  std::string until_task_name_;
+  boost::mutex mtx_;
  private:
   std::vector<std::string> task_wait_list_;
   std::vector<std::string> task_exec_list_;

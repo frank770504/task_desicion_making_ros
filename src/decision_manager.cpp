@@ -36,7 +36,8 @@ namespace decision_manager {
 const std::string DecisionManager::kCmdSubName_ = "task_cmd";
 
 DecisionManager::DecisionManager(ros::NodeHandle n)
-  : nh_(n), task_container_(n) {
+  : nh_(n), task_container_(n), is_until_command_flag_(true),
+    until_task_name_("") {
   web_cmd_sub_ = nh_.subscribe<std_msgs::String>(kCmdSubName_, 1,
     boost::bind(&DecisionManager::WebCmdCallback, this, _1));
   task_container_.SetTasksListener(TaskListenerPtr(this));
@@ -68,7 +69,7 @@ void DecisionManager::WebCmdCallback(const std_msgs::String::ConstPtr& str) {
 }
 
 void DecisionManager::DecisionListChecking(const TaskPtr& taskPtr) {
-ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+ROS_INFO_STREAM(__FUNCTION__);
   ROS_INFO_STREAM(taskPtr->GetTaskStatus()
     << " is the status of task: " << taskPtr->GetTaskName());
   StringIter exec_it = std::find(
@@ -102,12 +103,11 @@ ROS_INFO_STREAM(__FUNCTION__ << " ================================");
   for (int i = 0; i < task_exec_list_.size(); i++) {
     ROS_INFO_STREAM(task_exec_list_[i]);
   }
-  ROS_INFO_STREAM("task_wait_list_, after manuplating task: "
-                  << taskPtr->GetTaskName());
-  for (int i = 0; i < task_wait_list_.size(); i++) {
-    ROS_INFO_STREAM(task_wait_list_[i]);
-  }
-ROS_INFO_STREAM("=====================================");
+  //~ ROS_INFO_STREAM("task_wait_list_, after manuplating task: "
+                  //~ << taskPtr->GetTaskName());
+  //~ for (int i = 0; i < task_wait_list_.size(); i++) {
+    //~ ROS_INFO_STREAM(task_wait_list_[i]);
+  //~ }
 }
 
 void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) {
@@ -142,15 +142,8 @@ void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) 
       ROS_INFO_STREAM(taskPtr->GetTaskName() << ": stop");
       task_executor_.PostTask(taskPtr, TASK_STOP);
       task_until_map_[cmd.GetTaskName()] = taskPtr->GetTaskName();
-      // check task_wait_list_. if exist then execute it. if not do nothing.
-      // Since task_wait_list_ and task_exec_list_ are mutually exclusive sets
-      // we can only check one for conveniency.
-      StringIter wait_it = std::find(
-        task_wait_list_.begin(), task_wait_list_.end(), cmd.GetTaskName());
-      if (wait_it != task_wait_list_.end()) {
-        task_executor_.PostTask(
-          task_container_.GetTask(cmd.GetTaskName()), TASK_RUN);
-      }
+      is_until_command_flag_ = true;
+      until_task_name_ = cmd.GetTaskName();
     }
   } else {
     ROS_INFO_STREAM(cmd.GetCommand()
@@ -159,7 +152,8 @@ void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) 
 }
 
 void DecisionManager::OnTaskComplete(Task& task) {
-ROS_INFO_STREAM(__FUNCTION__);
+  mtx_.lock();
+ROS_INFO_STREAM(__FUNCTION__ << " =====");
   task.SetTaskStatus(kTaskStatusStop);
   std::string completed_task_name = task.GetTaskName();
   if (task_until_map_.find(completed_task_name) != task_until_map_.end()) { // NOLINT
@@ -169,7 +163,8 @@ ROS_INFO_STREAM(__FUNCTION__);
     reviving_task_ptr->SetTaskStatus(kTaskStatusRun);  // 2: two lines group
   }
   DecisionListChecking(task_container_.GetTask(task.GetTaskName()));
-  ROS_INFO_STREAM("=====================================");
+  ROS_INFO_STREAM(" =====");
+  mtx_.unlock();
 }
 void DecisionManager::OnTaskCancelled(Task& task) {
 ROS_INFO_STREAM(__FUNCTION__ << " ================================");
@@ -180,18 +175,36 @@ ROS_INFO_STREAM(__FUNCTION__ << " ================================");
 ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnTaskStopped(Task& task) {
-ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+  mtx_.lock();
+ROS_INFO_STREAM(__FUNCTION__ << " =====");
   task.SetTaskStatus(kTaskStatusStop);
   DecisionListChecking(task_container_.GetTask(task.GetTaskName()));
-ROS_INFO_STREAM("=====================================");
+  if (is_until_command_flag_) {
+    // check task_wait_list_. if exist then execute it. if not do nothing.
+    // Since task_wait_list_ and task_exec_list_ are mutually exclusive sets
+    // we can only check one for conveniency.
+    StringIter wait_it = std::find(
+      task_wait_list_.begin(), task_wait_list_.end(), until_task_name_);
+    if (wait_it != task_wait_list_.end()) {
+      task_executor_.PostTask(
+        task_container_.GetTask(until_task_name_), TASK_RUN);
+      task_container_.GetTask(until_task_name_)->SetTaskStatus(kTaskStatusRun);
+      DecisionListChecking(task_container_.GetTask(until_task_name_));
+    }
+    is_until_command_flag_ = false;
+  }
+ROS_INFO_STREAM(" =====");
+  mtx_.unlock();
 }
 void DecisionManager::OnGoalEvent(Task& task, TaskCommand& cmd) {
-ROS_INFO_STREAM(__FUNCTION__ << " ================================");
+  mtx_.lock();
+ROS_INFO_STREAM(__FUNCTION__ << " =====");
   ROS_INFO_STREAM(task.GetTaskName() << ": has been called (listener hero)");
   ROS_INFO_STREAM(cmd.GetCommand() << ": has been set (listener command)");
   ROS_INFO_STREAM(cmd.GetTaskName() << ": has been called (listener sidekick)");
   DecisionMaking(cmd, task_container_.GetTask(task.GetTaskName()));
-ROS_INFO_STREAM("=====================================");
+ROS_INFO_STREAM(" =====");
+  mtx_.unlock();
 }
 
 std::vector<std::string> DecisionManager::StringSplit(

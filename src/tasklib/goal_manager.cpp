@@ -121,13 +121,15 @@ void GoalManager::WaitGoalReaching() {
     // reach the current goal
     if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
       ROS_INFO_STREAM("Goal SUCCEEDED!!");
+      OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
     } else {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
+      cond_.notify_all();
     }
     //~ OnTaskEventCaller(*this, decision_manager::OnGoalControlID);
-    OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+    //~ OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
     //~ OnGoalEventCaller(*this, taskCommand_.StopTask(this->GetTaskName()));
-    cond_.notify_all();
+    //~ cond_.notify_all();
 }
 
 void GoalManager::GoalSending() {

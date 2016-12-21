@@ -66,7 +66,7 @@ void FindingTool::Initialize(
   nh_ = n;
   find_shelf_service_client_ =
     nh_.serviceClient<laser_tool::FindShelf>(kFindShelfServiceName_);
-  goal_pub_ = nh_.advertise<geometry_msgs::Pose>("new_goal", 2);
+  goal_pub_ = nh_.advertise<geometry_msgs::PoseStamped>("new_goal_stamped", 2);
 }
 
 void FindingTool::Run() {
@@ -76,14 +76,20 @@ void FindingTool::Run() {
     ROS_INFO_STREAM("shelf location" << shelf_loc);
     shelf_location_ = StringSplit(shelf_loc, " ");
     if (shelf_location_[0] == kFindShelfSucceedCmd_) {
-      geometry_msgs::Pose tmpose;
+      geometry_msgs::PoseStamped tmpose;
       std::string::size_type sz;
-      tmpose.position.x = stod(shelf_location_[1], &sz) + 0.2;;
-      tmpose.position.y = stod(shelf_location_[2], &sz);;
-      tmpose.position.z = 0.0;
-      double angle = stod(shelf_location_[3], &sz);
-      angle = angle * 3.1415926 / 180;
-      tmpose.orientation = tf::createQuaternionMsgFromYaw(angle);
+      //~ tmpose.position.x = stod(shelf_location_[1], &sz) + 0.2;;
+      //~ tmpose.position.y = stod(shelf_location_[2], &sz);;
+      //~ tmpose.position.z = 0.0;
+      //~ double angle = stod(shelf_location_[3], &sz);
+      //~ angle = angle * 3.1415926 / 180;
+      //~ tmpose.orientation = tf::createQuaternionMsgFromYaw(angle);
+      tmpose.header.stamp = ros::Time::now();
+      tmpose.pose.position.x = 1.0;
+      tmpose.pose.position.y = 0.0;
+      tmpose.pose.position.z = 0.0;
+      double angle = 0;
+      tmpose.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
       goal_pub_.publish(tmpose);
     }
 

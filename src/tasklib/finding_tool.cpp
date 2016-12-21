@@ -66,6 +66,7 @@ void FindingTool::Initialize(
   nh_ = n;
   find_shelf_service_client_ =
     nh_.serviceClient<laser_tool::FindShelf>(kFindShelfServiceName_);
+  goal_pub_ = nh_.advertise<geometry_msgs::Pose>("new_goal", 2);
 }
 
 void FindingTool::Run() {
@@ -75,16 +76,21 @@ void FindingTool::Run() {
     ROS_INFO_STREAM("shelf location" << shelf_loc);
     shelf_location_ = StringSplit(shelf_loc, " ");
     if (shelf_location_[0] == kFindShelfSucceedCmd_) {
-      //~ std::string::size_type sz;
-      //~ target_list[point_count+1].x = stod(shelf_location_[1], &sz) + 0.2;
-      //~ target_list[point_count+1].y = stod(shelf_location_[2], &sz);
-      //~ double cargo_angle = stod(shelf_location_[3], &sz);
-      //~ target_list[point_count+1].angle = degree_to_radius(cargo_angle);
+      geometry_msgs::Pose tmpose;
+      std::string::size_type sz;
+      tmpose.position.x = stod(shelf_location_[1], &sz) + 0.2;;
+      tmpose.position.y = stod(shelf_location_[2], &sz);;
+      tmpose.position.z = 0.0;
+      double angle = stod(shelf_location_[3], &sz);
+      angle = angle * 3.1415926 / 180;
+      tmpose.orientation = tf::createQuaternionMsgFromYaw(angle);
+      goal_pub_.publish(tmpose);
     }
 
   } else {
     ROS_INFO_STREAM("!!!! Finding Shelf Service Failed !!!!");
   }
+  OnTaskEventCaller(*this, decision_manager::OnTaskCompleteID);
 }
 
 void FindingTool::Stop() {

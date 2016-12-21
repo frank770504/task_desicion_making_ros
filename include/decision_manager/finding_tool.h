@@ -33,6 +33,9 @@
 #include <laser_tool/FindShelf.h>
 #include <ros/ros.h>
 #include <std_msgs/String.h>
+#include <geometry_msgs/Pose.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
 #include <queue>
 #include <string>
 #include <vector>
@@ -53,6 +56,7 @@ class FindingTool : public decision_manager::Task {
   static const std::string kFindShelfServiceName_;
   static const std::string kFindShelfSucceedCmd_;
   ros::ServiceClient find_shelf_service_client_;
+  ros::Publisher goal_pub_;
   laser_tool::FindShelf finding_tool_srv_catcher_;
   std::vector<std::string> shelf_location_;
  private:

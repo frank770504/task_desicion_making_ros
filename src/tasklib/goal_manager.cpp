@@ -125,8 +125,8 @@ void GoalManager::WaitGoalReaching() {
       ROS_INFO_STREAM("Goal Reaching FAILED!!");
     }
     //~ OnTaskEventCaller(*this, decision_manager::OnGoalControlID);
-    //~ OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
-    OnGoalEventCaller(*this, taskCommand_.StopTask(this->GetTaskName()));
+    OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+    //~ OnGoalEventCaller(*this, taskCommand_.StopTask(this->GetTaskName()));
     cond_.notify_all();
 }
 
@@ -266,7 +266,7 @@ void GoalManager::Stop() {
   }
   ROS_INFO_STREAM("task stop!");
   action_client_->cancelAllGoals();
-  OnTaskEventCaller(*this, decision_manager::OnTaskCompleteID);
+  OnTaskEventCaller(*this, decision_manager::OnTaskStoppedID);
 }
 };  // namespace decision_manager_plugin
 

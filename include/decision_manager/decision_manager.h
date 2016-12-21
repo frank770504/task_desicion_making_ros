@@ -44,6 +44,7 @@
 namespace decision_manager {
 class DecisionManager : public TaskListener {
   typedef std::map<std::string, TaskPtr> TaskMap;
+  typedef std::vector<std::string>::iterator StringIter;
 
  public:
   explicit DecisionManager(ros::NodeHandle n);
@@ -70,6 +71,7 @@ class DecisionManager : public TaskListener {
   std::vector<std::string> task_wait_list_;
   std::vector<std::string> task_exec_list_;
   TaskMap tasks_map_;
+  std::map<std::string, std::string> task_until_map_;
 };
 };  // namespace decision_manager
 

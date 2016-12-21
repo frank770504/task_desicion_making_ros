@@ -71,11 +71,9 @@ void DecisionManager::DecisionListChecking(const TaskPtr& taskPtr) {
 ROS_INFO_STREAM(__FUNCTION__ << " ================================");
   ROS_INFO_STREAM(taskPtr->GetTaskStatus()
     << " is the status of task: " << taskPtr->GetTaskName());
-  std::vector<std::string>::iterator exec_it;
-  std::vector<std::string>::iterator wait_it;
-  exec_it = std::find(
+  StringIter exec_it = std::find(
     task_exec_list_.begin(), task_exec_list_.end(), taskPtr->GetTaskName());
-  wait_it = std::find(
+  StringIter wait_it = std::find(
     task_wait_list_.begin(), task_wait_list_.end(), taskPtr->GetTaskName());
   if (taskPtr->GetTaskStatus() == kTaskStatusRun) {
     if (exec_it == task_exec_list_.end()) {
@@ -116,14 +114,17 @@ void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) 
   TaskPtr taskPtr = task_ptr;
   if (taskPtr == NullPtr) {
     taskPtr = task_container_.GetTask(cmd.GetTaskName());
+    if (taskPtr == NullPtr) {
+      ROS_WARN_STREAM("Task Not Gound of the command: " << cmd.GetCommand());
+    }
   }
+  TaskStatus ts = taskPtr->GetTaskState();
   if (cmd.GetCommand() == kTaskCommandRun) {
     ROS_INFO_STREAM(taskPtr->GetTaskName() << ": run");
     task_executor_.PostTask(taskPtr, TASK_RUN);  // 1: two lines group
     taskPtr->SetTaskStatus(kTaskStatusRun);  // 2: two lines group
     DecisionListChecking(taskPtr);
   } else if (cmd.GetCommand() == kTaskCommandWait) {
-    TaskStatus ts = taskPtr->GetTaskState();
     if (!ts.IsStoppable()) {
       ROS_WARN_STREAM(taskPtr->GetTaskName() << " cannot stop");
     } else {
@@ -133,6 +134,24 @@ void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) 
       // taskPtr->SetTaskStatus(kTaskStatusStop);
     }
   } else if (cmd.GetCommand() == kTaskCommandUntil) {
+    // Since kTaskCommandUntil can only be sent by an executed task, we don't 
+    // have to check the task_exec_list_ for the activate task.
+    if (!ts.IsStoppable()) {
+      ROS_WARN_STREAM(taskPtr->GetTaskName() << " cannot stop");
+    } else {
+      ROS_INFO_STREAM(taskPtr->GetTaskName() << ": stop");
+      task_executor_.PostTask(taskPtr, TASK_STOP);
+      task_until_map_[cmd.GetTaskName()] = taskPtr->GetTaskName();
+      // check task_wait_list_. if exist then execute it. if not do nothing.
+      // Since task_wait_list_ and task_exec_list_ are mutually exclusive sets
+      // we can only check one for conveniency.
+      StringIter wait_it = std::find(
+        task_wait_list_.begin(), task_wait_list_.end(), cmd.GetTaskName());
+      if (wait_it != task_wait_list_.end()) {
+        task_executor_.PostTask(
+          task_container_.GetTask(cmd.GetTaskName()), TASK_RUN);
+      }
+    }
   } else {
     ROS_INFO_STREAM(cmd.GetCommand()
       << " is a wrong command in task: " << taskPtr->GetTaskName());

@@ -161,8 +161,15 @@ void DecisionManager::DecisionMaking(TaskCommand& cmd, const TaskPtr& task_ptr) 
 void DecisionManager::OnTaskComplete(Task& task) {
 ROS_INFO_STREAM(__FUNCTION__);
   task.SetTaskStatus(kTaskStatusStop);
+  std::string completed_task_name = task.GetTaskName();
+  if (task_until_map_.find(completed_task_name) != task_until_map_.end()) { // NOLINT
+    std::string reviving_task_name = task_until_map_.at(completed_task_name);
+    TaskPtr reviving_task_ptr = task_container_.GetTask(reviving_task_name);
+    task_executor_.PostTask(reviving_task_ptr, TASK_RUN);  // 1: two lines group
+    reviving_task_ptr->SetTaskStatus(kTaskStatusRun);  // 2: two lines group
+  }
   DecisionListChecking(task_container_.GetTask(task.GetTaskName()));
-ROS_INFO_STREAM("=====================================");
+  ROS_INFO_STREAM("=====================================");
 }
 void DecisionManager::OnTaskCancelled(Task& task) {
 ROS_INFO_STREAM(__FUNCTION__ << " ================================");

@@ -46,8 +46,7 @@ const int GoalManager::kSleepTime_ = 100000;  // u sec
 
 GoalManager::GoalManager()
   : ind_(1), is_doing_topic_goal_(false),
-  is_wating_for_reaching_goal_(false), is_task_stop_(true),
-  workPtr_(new boost::asio::io_service::work(ioService_)) {
+  is_wating_for_reaching_goal_(false), is_task_stop_(true) {
 }
 
   // usage functions
@@ -114,26 +113,6 @@ void GoalManager::CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel) {
   action_client_->cancelAllGoals();
 }
 
-void GoalManager::WaitGoalReaching() {
-    while (action_client_->waitForResult(ros::Duration(1, 0)) == false) {
-      if (!nh_.ok())  // exit if ros node is closed. (by pressing ctrl+c)
-        exit(0);
-    }
-    // if don't cancel all the goals, the program will go to next goal after
-    // reach the current goal
-    if (action_client_->getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
-      ROS_INFO_STREAM("Goal SUCCEEDED!!");
-      OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
-    } else {
-      ROS_INFO_STREAM("Goal Reaching FAILED!!");
-      cond_.notify_all();
-    }
-    //~ OnTaskEventCaller(*this, decision_manager::OnGoalControlID);
-    //~ OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
-    //~ OnGoalEventCaller(*this, taskCommand_.StopTask(this->GetTaskName()));
-    //~ cond_.notify_all();
-}
-
 void GoalManager::GoalSending() {
   while (1) {
     boost::unique_lock<boost::mutex> task_lock{mtx_task_notify_};
@@ -192,7 +171,6 @@ void GoalManager::GoalSending() {
       ROS_INFO_STREAM(
         phase <<"| Sending Goal: - [" << point_tmp.x_ << ", "
               << point_tmp.y_ << ", " << point_tmp.th_ << "]");
-      ioService_.post(boost::bind(&GoalManager::WaitGoalReaching, this));
       usleep(kSleepTime_);
     }
   }
@@ -207,6 +185,15 @@ void GoalManager::ActionGoalDone(
   const actionlib::SimpleClientGoalState& state) {
   ROS_INFO_STREAM("ActionGoalDoneCB: " << state.toString());
   is_wating_for_reaching_goal_ = false;
+  // if don't cancel all the goals, the program will go to next goal after
+  // reach the current goal
+  if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
+    ROS_INFO_STREAM("Goal SUCCEEDED!!");
+    OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+  } else {
+    ROS_INFO_STREAM("Goal State: " << state.toString());
+    cond_.notify_all();
+  }
 }
   // test functions
 void GoalManager::ParamGoalVectorPrintTest() {
@@ -241,8 +228,6 @@ void GoalManager::Initialize(
 
   GoalSendingThread_.reset(
     new boost::thread(boost::bind(&GoalManager::GoalSending, this)) );
-  AsioThread_.reset(
-    new boost::thread(boost::bind(&boost::asio::io_service::run, &ioService_)));
   XmlRpc::XmlRpcValue yml;
   if (!nh_.getParam(kGoalSequenceKey_, yml)) {
     ROS_ERROR_STREAM("get " << kGoalSequenceKey_ << " error");

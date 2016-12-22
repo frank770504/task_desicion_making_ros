@@ -65,7 +65,6 @@ struct Point2D {
 class GoalManager : public decision_manager::Task {
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
     ActionClient;
-  typedef boost::shared_ptr<boost::asio::io_service::work> WorkPtr;
 
  public:
   GoalManager();
@@ -120,8 +119,6 @@ class GoalManager : public decision_manager::Task {
   boost::mutex mtx_task_notify_;
   boost::condition_variable_any cond_;
   boost::condition_variable_any task_cond_;
-  boost::asio::io_service ioService_;
-  WorkPtr workPtr_;
 
   ActionClient* action_client_;
   ros::Subscriber new_goal_sub_;

@@ -182,14 +182,20 @@ void GoalManager::GoalSending() {
     // the piority of  goal_vector is higher than param_goal_vector
 
     // send goal
-    action_client_->sendGoal(goal_tmp);
-    is_wating_for_reaching_goal_ = true;
+    action_client_->sendGoal(goal_tmp, ActionClient::SimpleDoneCallback(),
+                                       boost::bind(&GoalManager::ActionActive, this),
+                                       ActionClient::SimpleFeedbackCallback());
     ROS_INFO_STREAM(
       phase <<"| Sending Goal: - [" << point_tmp.x_ << ", "
             << point_tmp.y_ << ", " << point_tmp.th_ << "]");
     ioService_.post(boost::bind(&GoalManager::WaitGoalReaching, this));
     usleep(kSleepTime_);
   }
+}
+
+void GoalManager::ActionActive() {
+  ROS_INFO_STREAM("move_base_action_start");
+  is_wating_for_reaching_goal_ = true;
 }
 
   // test functions

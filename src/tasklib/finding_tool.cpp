@@ -96,6 +96,7 @@ void FindingTool::Run() {
   } else {
     ROS_INFO_STREAM("!!!! Finding Shelf Service Failed !!!!");
   }
+  usleep(500000);
   OnTaskEventCaller(*this, decision_manager::OnTaskCompleteID);
 }
 

@@ -85,11 +85,6 @@ void FindingTool::Run() {
       angle = angle * 3.1415926 / 180;
       tmpose.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
       tmpose.header.stamp = ros::Time::now();
-      //~ tmpose.pose.position.x = double(3.0);
-      //~ tmpose.pose.position.y = double(0.0);
-      //~ tmpose.pose.position.z = double(0.0);
-      //~ double angle = 0;
-      //~ tmpose.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
       goal_pub_.publish(tmpose);
     }
 

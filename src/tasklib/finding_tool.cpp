@@ -78,18 +78,18 @@ void FindingTool::Run() {
     if (shelf_location_[0] == kFindShelfSucceedCmd_) {
       geometry_msgs::PoseStamped tmpose;
       std::string::size_type sz;
-      //~ tmpose.position.x = stod(shelf_location_[1], &sz) + 0.2;;
-      //~ tmpose.position.y = stod(shelf_location_[2], &sz);;
-      //~ tmpose.position.z = 0.0;
-      //~ double angle = stod(shelf_location_[3], &sz);
-      //~ angle = angle * 3.1415926 / 180;
-      //~ tmpose.orientation = tf::createQuaternionMsgFromYaw(angle);
-      tmpose.header.stamp = ros::Time::now();
-      tmpose.pose.position.x = 1.0;
-      tmpose.pose.position.y = 0.0;
+      tmpose.pose.position.x = double(stod(shelf_location_[1], &sz) + 0.2);
+      tmpose.pose.position.y = double(stod(shelf_location_[2], &sz));
       tmpose.pose.position.z = 0.0;
-      double angle = 0;
+      double angle = stod(shelf_location_[3], &sz);
+      angle = angle * 3.1415926 / 180;
       tmpose.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
+      tmpose.header.stamp = ros::Time::now();
+      //~ tmpose.pose.position.x = double(3.0);
+      //~ tmpose.pose.position.y = double(0.0);
+      //~ tmpose.pose.position.z = double(0.0);
+      //~ double angle = 0;
+      //~ tmpose.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
       goal_pub_.publish(tmpose);
     }
 

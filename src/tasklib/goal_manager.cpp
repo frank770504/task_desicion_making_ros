@@ -57,6 +57,12 @@ void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPt
   geometry_msgs::PoseStamped pose_tmp;
   pose_tmp.header = goal->header;
   pose_tmp.pose = goal->pose;
+  //~ double x = 3.0;
+  //~ double y = 0.0;
+  //~ double z = 0.0;
+  //~ pose_tmp.pose.position.x = x;
+  //~ pose_tmp.pose.position.y = y;
+  //~ pose_tmp.pose.position.z = z;
   mtx_.lock();
   goal_vector_.push(pose_tmp);
   mtx_.unlock();

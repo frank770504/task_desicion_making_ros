@@ -86,6 +86,8 @@ class GoalManager : public decision_manager::Task {
   // test functions
   void ParamGoalVectorPrintTest();
   void ActionActive();
+  void ActionGoalDone(const actionlib::SimpleClientGoalState& state);
+                      //~ const move_base_msgs::MoveBaseActionResult& result);
 
  private:
   void NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal);

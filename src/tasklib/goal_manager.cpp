@@ -182,7 +182,7 @@ void GoalManager::GoalSending() {
     // the piority of  goal_vector is higher than param_goal_vector
 
     // send goal
-    action_client_->sendGoal(goal_tmp, ActionClient::SimpleDoneCallback(),
+    action_client_->sendGoal(goal_tmp, boost::bind(&GoalManager::ActionGoalDone, this, _1),
                                        boost::bind(&GoalManager::ActionActive, this),
                                        ActionClient::SimpleFeedbackCallback());
     ROS_INFO_STREAM(
@@ -198,6 +198,10 @@ void GoalManager::ActionActive() {
   is_wating_for_reaching_goal_ = true;
 }
 
+void GoalManager::ActionGoalDone(
+  const actionlib::SimpleClientGoalState& state) {
+  ROS_INFO_STREAM("ActionGoalDoneCB: " << state.toString());
+}
   // test functions
 void GoalManager::ParamGoalVectorPrintTest() {
   for (int i = 0; i < param_goal_vector_.size(); i++) {

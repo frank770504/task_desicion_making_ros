@@ -39,6 +39,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <decision_manager/TaskGoalMsg.h>
 
 namespace decision_manager_plugin {
 

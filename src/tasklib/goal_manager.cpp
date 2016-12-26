@@ -38,6 +38,7 @@ namespace decision_manager_plugin {
 
 // add defined name here
 const std::string GoalManager::kCancelGoalSubName_ = "cancel_goal";
+const std::string GoalManager::kTaskGoalSubName_ = "task_goal";
 const std::string GoalManager::kNewGoalSubName_ = "new_goal";
 const std::string GoalManager::kNewGoalStampedSubName_ = "new_goal_stamped";
 const std::string GoalManager::kGoalSequenceKey_ = "goal_sequence";
@@ -65,6 +66,30 @@ void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPt
   decision_manager::TaskGoalMsg tmp;
   tmp.command = kEmptyCommandOrTask_;
   tmp.task = kEmptyCommandOrTask_;
+  goal_task_map_[pose_tmp.header.stamp] = tmp;
+  if (is_goal_vector_empty) {
+    if (is_param_goal_vector_empty && !is_doing_topic_goal_)
+      cond_.notify_all();
+  } else if (!is_doing_topic_goal_ && is_wating_for_reaching_goal_) {
+    action_client_->cancelAllGoals();
+    cond_.notify_all();
+  }  // else do nothing
+}
+
+void GoalManager::TaskGoalSubCbk(const decision_manager::TaskGoalMsg::ConstPtr& goal) {
+  bool is_goal_vector_empty = goal_vector_.empty();
+  bool is_param_goal_vector_empty = param_goal_vector_.empty();
+  geometry_msgs::PoseStamped pose_tmp;
+  pose_tmp.pose.position.x = goal->x;
+  pose_tmp.pose.position.y = goal->y;
+  pose_tmp.pose.orientation = tf::createQuaternionMsgFromYaw(goal->th);
+  mtx_.lock();
+  pose_tmp.header.stamp = ros::Time::now();
+  goal_vector_.push(pose_tmp);
+  mtx_.unlock();
+  decision_manager::TaskGoalMsg tmp;
+  tmp.command = goal->command;
+  tmp.task = goal->task;
   goal_task_map_[pose_tmp.header.stamp] = tmp;
   if (is_goal_vector_empty) {
     if (is_param_goal_vector_empty && !is_doing_topic_goal_)
@@ -235,6 +260,8 @@ void GoalManager::Initialize(
   ROS_INFO("Server OK");
   current_task_stamp_ = ros::Time::now();
 
+  task_goal_sub_ = nh_.subscribe<decision_manager::TaskGoalMsg>(
+    kTaskGoalSubName_, 1, boost::bind(&GoalManager::TaskGoalSubCbk, this, _1));  // NOLINT
   new_goal_stamped_sub_ = nh_.subscribe<geometry_msgs::PoseStamped>(
     kNewGoalStampedSubName_, 1, boost::bind(&GoalManager::NewGoalStampedSubCbk, this, _1));  // NOLINT
   new_goal_sub_ = nh_.subscribe<geometry_msgs::Pose>(

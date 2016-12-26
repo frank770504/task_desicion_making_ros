@@ -80,6 +80,7 @@ class GoalManager : public decision_manager::Task {
  private:
   void NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPtr& goal);
   void NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal);
+  void TaskGoalSubCbk(const decision_manager::TaskGoalMsg::ConstPtr& goal);
   void CancelGoalSubCbk(const std_msgs::String::ConstPtr& cancel);
   void WaitGoalReaching();
   void ReleaseGoalVectors();
@@ -96,6 +97,7 @@ class GoalManager : public decision_manager::Task {
   std::map<ros::Time, decision_manager::TaskGoalMsg> goal_task_map_;
   ros::Time current_task_stamp_;
   static const int kSleepTime_;
+  static const std::string kTaskGoalSubName_;
   static const std::string kNewGoalSubName_;
   static const std::string kNewGoalStampedSubName_;
   static const std::string kCancelGoalSubName_;
@@ -113,6 +115,7 @@ class GoalManager : public decision_manager::Task {
   boost::condition_variable_any task_cond_;
 
   ActionClient* action_client_;
+  ros::Subscriber task_goal_sub_;
   ros::Subscriber new_goal_sub_;
   ros::Subscriber new_goal_stamped_sub_;
   ros::Subscriber cancel_goal_sub_;

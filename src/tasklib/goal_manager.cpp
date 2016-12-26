@@ -201,10 +201,19 @@ void GoalManager::ActionGoalDone(
   // if don't cancel all the goals, the program will go to next goal after
   // reach the current goal
   decision_manager::TaskGoalMsg tmp = goal_task_map_[current_task_stamp_];
+  goal_task_map_.erase(current_task_stamp_);
   ROS_INFO_STREAM(tmp.command << ", " << tmp.task);
   if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
     ROS_INFO_STREAM("Goal SUCCEEDED!!");
-    OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
+    if (tmp.command == decision_manager::kTaskCommandUntil) {
+      OnGoalEventCaller(*this, taskCommand_.StopSelfUntil(tmp.task));
+    } else if (tmp.command == decision_manager::kTaskCommandRun) {
+      OnGoalEventCaller(*this, taskCommand_.RunTask(tmp.task));
+    } else if (tmp.command == decision_manager::kTaskCommandWait) {
+      OnGoalEventCaller(*this, taskCommand_.StopTask(tmp.task));
+    } else {
+      cond_.notify_all();
+    }
   } else {
     ROS_INFO_STREAM("Goal State: " << state.toString());
     cond_.notify_all();

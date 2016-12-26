@@ -9,3 +9,9 @@
     <description>FindingTool plugin.</description>
   </class>
 </library>
+
+<library path="libshelf_combiner_lib">
+  <class type="decision_manager_plugin::ShelfCombiner" base_class_type="decision_manager::Task">
+    <description>ShelfCombiner plugin.</description>
+  </class>
+</library>

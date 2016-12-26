@@ -122,7 +122,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES goal_manager_lib finding_tool_lib
+  LIBRARIES goal_manager_lib finding_tool_lib shelf_combiner_lib
   CATKIN_DEPENDS actionlib roscpp rospy rostest std_msgs pluginlib
 #  DEPENDS system_lib
 )
@@ -154,6 +154,7 @@ include_directories(
 add_library(goal_manager_lib src/tasklib/goal_manager.cpp)
 add_dependencies(goal_manager_lib decision_manager_generate_messages_cpp)
 add_library(finding_tool_lib src/tasklib/finding_tool.cpp)
+add_library(shelf_combiner_lib src/tasklib/shelf_combiner.cpp)
 add_executable(decision_manager ${PROJECT_SRC})
 add_executable(goal_manager_loader src/self-test/task_loader.cpp)
 add_executable(task_listener_loader src/self-test/task_listener_loader.cpp)
@@ -172,6 +173,7 @@ add_executable(task_executor_test src/self-test/task_executor_test.cpp src/task_
 target_link_libraries(decision_manager ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_lib ${catkin_LIBRARIES})
 target_link_libraries(finding_tool_lib ${catkin_LIBRARIES})
+target_link_libraries(shelf_combiner_lib ${catkin_LIBRARIES})
 target_link_libraries(goal_manager_loader ${catkin_LIBRARIES})
 target_link_libraries(task_listener_loader ${catkin_LIBRARIES})
 target_link_libraries(task_container_test ${catkin_LIBRARIES})

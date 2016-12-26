@@ -4,11 +4,16 @@ decision_manager:
   used_task_list:
     - GoalManager
     - FindingTool
+    - ShelfCombiner
   GoalManager:
     task_command: "GoalManager"
     can_stop: true
     can_cancel: true
   FindingTool:
     task_command: "FindingTool"
+    can_stop: false
+    can_cancel: false
+  ShelfCombiner:
+    task_command: "ShelfCombiner"
     can_stop: false
     can_cancel: false

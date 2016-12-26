@@ -1,6 +1,7 @@
+# None or TaskName
 goal_sequence:
-  - [1.0, 0.25, 0.0]
-  - [3.0, 0.25, 0.0]
-  - [4.0, 0.25, 0.0]
+  - [1.0, 0.25, 0.0, task.command.until, FindingTool]
+  - [3.0, 0.25, 0.0, None, None]
+  - [4.0, 0.25, 0.0, None, None]
   #~ - [3.5, 0.0, 0.0]
   #~ - [4.0, 0.0, 0.0]

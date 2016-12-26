@@ -93,7 +93,7 @@ class GoalManager : public decision_manager::Task {
   bool is_task_stop_;
   std::queue<geometry_msgs::PoseStamped> goal_vector_;
   std::vector<decision_manager::TaskGoalMsg> param_goal_vector_;
-  std::map<ros::Time, std::string> goal_task_map_;
+  std::map<ros::Time, decision_manager::TaskGoalMsg> goal_task_map_;
   ros::Time current_task_stamp_;
   static const int kSleepTime_;
   static const std::string kNewGoalSubName_;
@@ -102,6 +102,7 @@ class GoalManager : public decision_manager::Task {
   static const std::string kGoalSequenceKey_;
   static const std::string kActionLibServername_;
   static const std::string kGoalFrameId_;
+  static const std::string kEmptyCommandOrTask_;
 
   boost::shared_ptr<boost::thread> GoalSendingThread_;
   boost::shared_ptr<boost::thread> AsioThread_;

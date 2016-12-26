@@ -44,6 +44,7 @@ const std::string GoalManager::kGoalSequenceKey_ = "goal_sequence";
 const std::string GoalManager::kActionLibServername_ = "move_base";
 const std::string GoalManager::kGoalFrameId_ = "map";
 const int GoalManager::kSleepTime_ = 100000;  // u sec
+const std::string GoalManager::kEmptyCommandOrTask_ = "None";
 
 GoalManager::GoalManager()
   : ind_(1), is_doing_topic_goal_(false),
@@ -61,6 +62,10 @@ void GoalManager::NewGoalStampedSubCbk(const geometry_msgs::PoseStamped::ConstPt
   pose_tmp.header.stamp = ros::Time::now();
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
+  decision_manager::TaskGoalMsg tmp;
+  tmp.command = kEmptyCommandOrTask_;
+  tmp.task = kEmptyCommandOrTask_;
+  goal_task_map_[pose_tmp.header.stamp] = tmp;
   if (is_goal_vector_empty) {
     if (is_param_goal_vector_empty && !is_doing_topic_goal_)
       cond_.notify_all();
@@ -80,6 +85,10 @@ void GoalManager::NewGoalSubCbk(const geometry_msgs::Pose::ConstPtr& goal) {
   pose_tmp.header.stamp = ros::Time::now();
   goal_vector_.push(pose_tmp);
   mtx_.unlock();
+  decision_manager::TaskGoalMsg tmp;
+  tmp.command = kEmptyCommandOrTask_;
+  tmp.task = kEmptyCommandOrTask_;
+  goal_task_map_[pose_tmp.header.stamp] = tmp;
   if (is_goal_vector_empty) {
     if (is_param_goal_vector_empty && !is_doing_topic_goal_)
       cond_.notify_all();
@@ -162,13 +171,13 @@ void GoalManager::GoalSending() {
         mtx_.lock();
         goal_tmp.target_pose.header.stamp = ros::Time::now();
         mtx_.unlock();
-        goal_task_map_[goal_tmp.target_pose.header.stamp] = point_tmp.task;
-        current_task_stamp_ = goal_tmp.target_pose.header.stamp;
+        goal_task_map_[goal_tmp.target_pose.header.stamp] = point_tmp;
         phase = "param";
       }
       // the piority of  goal_vector is higher than param_goal_vector
       // send goal
       goal_tmp.target_pose.header.frame_id = kGoalFrameId_;
+      current_task_stamp_ = goal_tmp.target_pose.header.stamp;
       action_client_->sendGoal(goal_tmp, boost::bind(&GoalManager::ActionGoalDone, this, _1),
                                          boost::bind(&GoalManager::ActionActive, this),
                                          ActionClient::SimpleFeedbackCallback());
@@ -191,6 +200,8 @@ void GoalManager::ActionGoalDone(
   is_wating_for_reaching_goal_ = false;
   // if don't cancel all the goals, the program will go to next goal after
   // reach the current goal
+  decision_manager::TaskGoalMsg tmp = goal_task_map_[current_task_stamp_];
+  ROS_INFO_STREAM(tmp.command << ", " << tmp.task);
   if (state == actionlib::SimpleClientGoalState::SUCCEEDED) {  // NOLINT
     ROS_INFO_STREAM("Goal SUCCEEDED!!");
     OnGoalEventCaller(*this, taskCommand_.StopSelfUntil("FindingTool"));
@@ -238,7 +249,8 @@ void GoalManager::Initialize(
     goal_tmp.x = static_cast<double>(tmp[0]);
     goal_tmp.y = static_cast<double>(tmp[1]);
     goal_tmp.th = static_cast<double>(tmp[2]);
-    goal_tmp.task = static_cast<std::string>(tmp[3]);
+    goal_tmp.command = static_cast<std::string>(tmp[3]);
+    goal_tmp.task = static_cast<std::string>(tmp[4]);
     param_goal_vector_.push_back(goal_tmp);
   }
   cond_.notify_all();

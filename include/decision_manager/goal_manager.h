@@ -46,21 +46,11 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <decision_manager/TaskGoalMsg.h>
 
 namespace decision_manager_plugin {
 
 // maybe I have to add a namespace here
-
-struct Point2D {
-  Point2D() : x_(0), y_(0), th_(0) {
-  }
-  Point2D(double x, double y, double th)
-    : x_(x), y_(y), th_(th) {
-  }
-  double x_;
-  double y_;
-  double th_;
-};
 
 class GoalManager : public decision_manager::Task {
   typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
@@ -83,7 +73,6 @@ class GoalManager : public decision_manager::Task {
   void Stop();
 
   // test functions
-  void ParamGoalVectorPrintTest();
   void ActionActive();
   void ActionGoalDone(const actionlib::SimpleClientGoalState& state);
                       //~ const move_base_msgs::MoveBaseActionResult& result);
@@ -103,7 +92,9 @@ class GoalManager : public decision_manager::Task {
   bool is_wating_for_reaching_goal_;
   bool is_task_stop_;
   std::queue<geometry_msgs::PoseStamped> goal_vector_;
-  std::vector<Point2D> param_goal_vector_;
+  std::vector<decision_manager::TaskGoalMsg> param_goal_vector_;
+  std::map<ros::Time, std::string> goal_task_map_;
+  ros::Time current_task_stamp_;
   static const int kSleepTime_;
   static const std::string kNewGoalSubName_;
   static const std::string kNewGoalStampedSubName_;

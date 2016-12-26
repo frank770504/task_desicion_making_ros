@@ -84,8 +84,8 @@ void FindingTool::Run() {
       double angle = stod(shelf_location_[3], &sz);
       angle = angle * 3.1415926 / 180;
       tmpose.th = angle;
-      tmpose.command = "None_f";
-      tmpose.task = "None_ff";
+      tmpose.command = "task.command.until";
+      tmpose.task = "ShelfCombiner";
       goal_pub_.publish(tmpose);
     }
 
